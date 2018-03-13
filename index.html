@@ -2,21 +2,32 @@
 <html>
   <head>
     <title>Drawing Page</title>
+    <!--reference the 2 javascript files that this html page will use-->
     <script src="fabric.js"></script>
+    <script src="drawingMode.js"></script>
+
+    <!-- add jquery-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   </head>
   <body>
+
+    <!--load elements -->
     <canvas id="canvas" width="800" height="450" style="boarder:1px solid #000000"></canvas>
-
+    <button id="black" value="000000">black</button>
     <script>
-      var canvas = new fabric.Canvas('canvas');
-      canvas.add(new fabric.Circle({radius:30, fill: '#f55', top:100, left:100}));
 
-      canvas.selectionColor = 'rgba(0,255,0,0.3)';
-      canvas.selectionBoarderColor = 'red';
-      canvas.selectionLineWidth = 5;
+      var canvas;
 
+      $(function(){
+        canvas = window._canvas = new fabric.Canvas('canvas');
+        canvas.isDrawingMode=1;
+        canvas.freeDrawingBrush.color = "purple";
+        canvas.freeDrawingBrush.width = 10;
+        canvas.renderAll();
+
+
+      });
     </script>
-
 
   </body>
 </html>
