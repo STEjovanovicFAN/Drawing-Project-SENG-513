@@ -46,11 +46,11 @@
     <!--checkbox that is checked for drawing -->
     <!--Drawing: <input id="mode" type="checkbox" checked><br/>-->
     <!--color of the brush -->
-    Color: <input id="color" type="color" value="#ff0000"><br/>
+    Color: <input id="color" type="color" value="#000000"><br/>
     <!--size of the brush -->
     Brush size: <input id="size" type="range" min="1" max="100" step="1" value="20"><br/>
     <!--brush opcacity -->
-    Brush opacity: <input id="opacity" type="number" min="0" max="1" step="0.1" value="0.5"><br/>
+    <!--Brush opacity: <input id="opacity" type="number" min="0" max="1" step="0.1" value="0.5"><br/>-->
 
     <!--canvas with cursor -->
     <div id="cont">
@@ -70,7 +70,7 @@
 
       //initalize the brushes width and color
       canvas.freeDrawingBrush.width = 20;
-      canvas.freeDrawingBrush.color = '#ff0000';
+      canvas.freeDrawingBrush.color = '#000000';
 
       //set cursorOpacity to 50%
       var cursorOpacity = .5;
@@ -79,7 +79,7 @@
         left: -100,
         top: -100,
         radius: canvas.freeDrawingBrush.width / 2,
-        fill: "rgba(255,0,0," + cursorOpacity + ")",
+        fill: "rgba(196,196,196," + cursorOpacity + ")",
         stroke: "black",
         originX: 'center',
         originY: 'center'
@@ -104,8 +104,8 @@
         // put circle off screen
         mousecursor
         	.set({
-            top: mousecursor.originalState.top,
-            left: mousecursor.originalState.left
+            top: -100,//mousecursor.originalState.top,
+            left: -100 //mousecursor.originalState.left
           })
           .setCoords()
           .canvas.renderAll();
@@ -129,8 +129,8 @@
         canvas.freeDrawingBrush.width = size;
         mousecursor
         	.set({
-            left: mousecursor.originalState.left,
-            top: mousecursor.originalState.top,
+            //left: mousecursor.originalState.left,
+            //top: mousecursor.originalState.top,
             radius: size/2
         	})
           .setCoords()
@@ -138,12 +138,12 @@
       };
 
       //change mousecursor opacity
-      document.getElementById("opacity").onchange = function () {
+      /*document.getElementById("opacity").onchange = function () {
       	cursorOpacity = this.value;
         var fill = mousecursor.fill.split(",");
         fill[fill.length-1] = cursorOpacity + ")";
         mousecursor.fill = fill.join(",");
-      };
+      };*/
 
       //change drawing color
       document.getElementById("color").onchange = function () {
@@ -152,11 +152,11 @@
         var r = (bigint >> 16) & 255;
         var g = (bigint >> 8) & 255;
         var b = bigint & 255;
-        mousecursor.fill = "rgba(" + [r,g,b,cursorOpacity].join(",") + ")";
+        //mousecursor.fill = "rgba(" + [r,g,b,cursorOpacity].join(",") + ")";
       };
 
       //switch drawing mode
-      document.getElementById("mode").onchange = function () {
+      /*document.getElementById("mode").onchange = function () {
       	canvas.isDrawingMode = this.checked;
 
         if (!this.checked) {
@@ -166,7 +166,7 @@
         	canvas.deactivateAll().renderAll();
         	cursor.add(mousecursor);
         }
-      };
+      };*/
     </script>
 
   </body>
