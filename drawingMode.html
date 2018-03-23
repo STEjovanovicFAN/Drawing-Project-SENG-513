@@ -3,7 +3,7 @@
   <head>
     <title>Drawing Page</title>
     <!--reference the 2 javascript files that this html page will use-->
-    <script src="fabric.js"></script>
+    <!--<script src="fabric.js"></script>-->
     <style>
           #cont {
       position: relative;
@@ -29,6 +29,7 @@
     </style>
 
     <!-- add jquery-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/2.2.2/fabric.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   </head>
   <body>
@@ -59,6 +60,12 @@
     </div>
 
     <script>
+      //whenever the mouse clicks do event
+      /*$('body').on("click",function(e){
+        console.log("mouse has been clicked");
+        console.log();
+      });*/
+
       //set the new canvas to be able to draw
       var canvas = new fabric.Canvas("draw", {
       	isDrawingMode: true,
@@ -109,6 +116,10 @@
           })
           .setCoords()
           .canvas.renderAll();
+      });
+
+      canvas.on('mouse:up', function(){
+        console.log(JSON.stringify(canvas));
       });
 
       //while brush size is changed
