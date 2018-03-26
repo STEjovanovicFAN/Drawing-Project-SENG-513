@@ -3,8 +3,6 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var port = process.env.PORT || 3000;
 
-var socketPeople = [];
-var totalClients = 0;
 var drawingWordsDictionary = ["pen", "jar","ocean","worm", "cloud", "fly", "lollipop", "wheel", "apple", "triangle", "diamond", "lemon", "pig", "fire", "ring", "motorcycle", "water", "glasses", "kitten", "octopus", "eye",
 "woman", "ears", "cat", "drum", "family", "shirt", "crack", "chimney", "rabbit", "pillow", "square", "oval", "swing", "girl", "bed", "line", "skateboard", "spoon", "kite", "stairs", "cup", "bunny", "snake", "sun",
 "spider web", "flower", "milk", "blanket", "jellyfish", "snowman", "candle", "love", "doll", "king", "bear", "dragon", "frog", "bat", "banana", "box", "face", "table", "music", "bird", "book", "whale", "legs",
@@ -16,6 +14,8 @@ var drawingWordsDictionary = ["pen", "jar","ocean","worm", "cloud", "fly", "loll
 "bowl", "cookie", "feather", "egg", "clock", "swimming pool", "night", "monster", "fork", "hippo", "hair", "bench", "jacket", "candy", "coat", "boy", "tail", "basketball", "popsicle", "bumblebee", "giraffe",
 "alive", "bow", "suitcase", "elephant", "dog", "shoe", "moon", "lamp", "mouse", "bone", "curl", "truck", "island", "knee", "zebra", "corn", "man", "grapes", "dream", "bug", "mountains", "lips", "baseball",
 "key", "coin", "hook", "arm", "computer", "lizard", "bee", "slide", "mitten", "rock", "head", "Mickey Mouse", "helicopter", "earth"];
+var totalClients = 0;
+var currentWord = " ";
 
 
 app.get('/', function(req, res){
@@ -38,12 +38,43 @@ io.on('connection', function(socket){
   //when the user disconnects take him off the onlineUser list
   socket.on('disconnect', function(){
     console.log('user disconnected');
+    //totalClients--;
 
   });
+
+  //if server gets data broadcast it to all clients
   socket.on('push data', function(data){
     io.emit('receive data', data);
     console.log("pushed the dtat to clients");
   });
+
+  socket.on('word guess', function(guess){
+    var userGuess = guess.toLowerCase();
+
+    if(userGuess === currentWord){
+      console.log("you guessed coredasdjdska");
+    }
+    else{
+      console.log("you fucked up phaggot");
+    }
+  });
+
+  //get a random word and give it to the drawer
+  socket.on('getDrawingWord', function(){
+    //choose a random word
+    var item = drawingWordsDictionary[Math.floor(Math.random()*drawingWordsDictionary.length)];
+    currentWord = item.toLowerCase();
+
+    //delete the random word from the dictionary
+    var index = drawingWordsDictionary.indexOf(item);
+    if(index > -1){
+      drawingWordsDictionary.splice(index, 1);
+    }
+
+    //give the word to the drawer
+    socket.emit('recvWord', item);
+  });
+
 });
 
 //print message on command prompt to signal that the server is running

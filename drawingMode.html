@@ -44,10 +44,18 @@
       <canvas id="draw" width="500" height="500"></canvas>
       <canvas id="cursor" width="500" height="500"></canvas>
     </div>
+    <h1>Your word is: <span id = word>null</span.</h1>
 
     <script>
-
       var socket = io();
+      var word;
+      socket.emit('getDrawingWord');
+
+      //listen for a responce from server for the word you have to draw
+      socket.on('recvWord', function(responce){
+        word = responce;
+        document.getElementById("word").innerHTML = word;
+      });
 
       //set the new canvas to be able to draw
       var canvas = new fabric.Canvas("draw", {
