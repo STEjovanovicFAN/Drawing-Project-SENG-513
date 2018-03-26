@@ -34,25 +34,10 @@
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
   </head>
   <body>
-
-    <!--load elements -->
-    <!--
-    <canvas id="canvas" width="800" height="450" style="boarder:1px solid #000000"></canvas>
-    <div id="drawing-mode-options">
-      <label for="dwaring-line-width">Line width:</lable>
-      <span oninput="rangeInput.value=amount"id="widthAmount">30</span>
-      <input for="amount" oninput="amount.value=rangeInput.value" type="range" value="30" min="0" max="150" id="drawing-line-width" name="rangeInput">
-    </div>
-  -->
-
-    <!--checkbox that is checked for drawing -->
-    <!--Drawing: <input id="mode" type="checkbox" checked><br/>-->
     <!--color of the brush -->
     Color: <input id="color" type="color" value="#000000"><br/>
     <!--size of the brush -->
     Brush size: <input id="size" type="range" min="1" max="100" step="1" value="20"><br/>
-    <!--brush opcacity -->
-    <!--Brush opacity: <input id="opacity" type="number" min="0" max="1" step="0.1" value="0.5"><br/>-->
 
     <!--canvas with cursor -->
     <div id="cont">
@@ -61,11 +46,6 @@
     </div>
 
     <script>
-      //whenever the mouse clicks do event
-      /*$('body').on("click",function(e){
-        console.log("mouse has been clicked");
-        console.log();
-      });*/
 
       var socket = io();
 
@@ -152,14 +132,6 @@
           .canvas.renderAll();
       };
 
-      //change mousecursor opacity
-      /*document.getElementById("opacity").onchange = function () {
-      	cursorOpacity = this.value;
-        var fill = mousecursor.fill.split(",");
-        fill[fill.length-1] = cursorOpacity + ")";
-        mousecursor.fill = fill.join(",");
-      };*/
-
       //change drawing color
       document.getElementById("color").onchange = function () {
       	canvas.freeDrawingBrush.color = this.value;
@@ -169,19 +141,6 @@
         var b = bigint & 255;
         //mousecursor.fill = "rgba(" + [r,g,b,cursorOpacity].join(",") + ")";
       };
-
-      //switch drawing mode
-      /*document.getElementById("mode").onchange = function () {
-      	canvas.isDrawingMode = this.checked;
-
-        if (!this.checked) {
-        	cursor.remove(mousecursor);
-        }
-        else {
-        	canvas.deactivateAll().renderAll();
-        	cursor.add(mousecursor);
-        }
-      };*/
     </script>
 
   </body>

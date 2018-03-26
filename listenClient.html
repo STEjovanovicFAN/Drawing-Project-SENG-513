@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Drawing Page</title>
+    <title>Listening Page</title>
     <!--reference the 2 javascript files that this html page will use-->
     <!--<script src="fabric.js"></script>-->
     <style>
@@ -35,38 +35,13 @@
   </head>
   <body>
 
-    <!--load elements -->
-    <!--
-    <canvas id="canvas" width="800" height="450" style="boarder:1px solid #000000"></canvas>
-    <div id="drawing-mode-options">
-      <label for="dwaring-line-width">Line width:</lable>
-      <span oninput="rangeInput.value=amount"id="widthAmount">30</span>
-      <input for="amount" oninput="amount.value=rangeInput.value" type="range" value="30" min="0" max="150" id="drawing-line-width" name="rangeInput">
-    </div>
-  -->
-
-    <!--checkbox that is checked for drawing -->
-    <!--Drawing: <input id="mode" type="checkbox" checked><br/>-->
-    <!--color of the brush -->
-    <!--Color: <input id="color" type="color" value="#000000"><br/>-->
-    <!--size of the brush -->
-    <!--Brush size: <input id="size" type="range" min="1" max="100" step="1" value="20"><br/>-->
-
-    <!--Brush opacity: <input id="opacity" type="number" min="0" max="1" step="0.1" value="0.5"><br/>-->
-
     <!--canvas with cursor -->
     <div id="cont">
       <canvas id="draw" width="500" height="500"></canvas>
-      <canvas id="cursor" width="500" height="500"></canvas>
     </div>
 
     <script>
-      //whenever the mouse clicks do event
-      /*$('body').on("click",function(e){
-        console.log("mouse has been clicked");
-        console.log();
-      });*/
-
+      //socket to connect to the server
       var socket = io();
 
       //set the new canvas to be able to draw
@@ -82,109 +57,6 @@
       //get the cursor
       var cursor = new fabric.StaticCanvas("cursor");
 
-      //initalize the brushes width and color
-      //canvas.freeDrawingBrush.width = 20;
-      //canvas.freeDrawingBrush.color = '#000000';
-/*
-      //set cursorOpacity to 50%
-      var cursorOpacity = .5;
-      //make the mousecursor a circle with the below attributes
-      var mousecursor = new fabric.Circle({
-        left: -100,
-        top: -100,
-        radius: canvas.freeDrawingBrush.width / 2,
-        fill: "rgba(196,196,196," + cursorOpacity + ")",
-        stroke: "black",
-        originX: 'center',
-        originY: 'center'
-      });
-
-      //add the cursor to the canvas
-      cursor.add(mousecursor);
-
-      //when the mouse moves
-      canvas.on('mouse:move', function (evt) {
-      	var mouse = this.getPointer(evt.e);
-        mousecursor
-        	.set({
-            top: mouse.y,
-            left: mouse.x
-          })
-          .setCoords()
-      	  .canvas.renderAll();
-      });
-
-      canvas.on('mouse:out', function () {
-        // put circle off screen
-        mousecursor
-        	.set({
-            top: -100,//mousecursor.originalState.top,
-            left: -100 //mousecursor.originalState.left
-          })
-          .setCoords()
-          .canvas.renderAll();
-      });
-
-      canvas.on('mouse:up', function(){
-        console.log(JSON.stringify(canvas));
-      });
-
-      //while brush size is changed
-      document.getElementById("size").oninput = function () {
-      	var size = this.value;
-        mousecursor
-        	.center()
-        	.set({
-            radius: size/2
-        	})
-          .setCoords()
-          .canvas.renderAll();
-      };
-
-      //after brush size has been changed
-      document.getElementById("size").onchange = function () {
-      	var size = parseInt(this.value, 10);
-        canvas.freeDrawingBrush.width = size;
-        mousecursor
-        	.set({
-            //left: mousecursor.originalState.left,
-            //top: mousecursor.originalState.top,
-            radius: size/2
-        	})
-          .setCoords()
-          .canvas.renderAll();
-      };
-
-      //change mousecursor opacity
-      /*document.getElementById("opacity").onchange = function () {
-      	cursorOpacity = this.value;
-        var fill = mousecursor.fill.split(",");
-        fill[fill.length-1] = cursorOpacity + ")";
-        mousecursor.fill = fill.join(",");
-      };*/
-      /*
-      //change drawing color
-      document.getElementById("color").onchange = function () {
-      	canvas.freeDrawingBrush.color = this.value;
-        var bigint = parseInt(this.value.replace("#", ""), 16);
-        var r = (bigint >> 16) & 255;
-        var g = (bigint >> 8) & 255;
-        var b = bigint & 255;
-        //mousecursor.fill = "rgba(" + [r,g,b,cursorOpacity].join(",") + ")";
-      };
-
-      //switch drawing mode
-      /*document.getElementById("mode").onchange = function () {
-      	canvas.isDrawingMode = this.checked;
-
-        if (!this.checked) {
-        	cursor.remove(mousecursor);
-        }
-        else {
-        	canvas.deactivateAll().renderAll();
-        	cursor.add(mousecursor);
-        }
-      };*/
     </script>
 
   </body>

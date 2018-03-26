@@ -6,6 +6,7 @@ var port = process.env.PORT || 3000;
 var socketPeople = [];
 var totalClients = 0;
 
+
 app.get('/', function(req, res){
   //res.sendFile(__dirname + '/fabric.js');
   if(totalClients === 0){
