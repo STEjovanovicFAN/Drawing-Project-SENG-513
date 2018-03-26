@@ -48,10 +48,10 @@
     <!--checkbox that is checked for drawing -->
     <!--Drawing: <input id="mode" type="checkbox" checked><br/>-->
     <!--color of the brush -->
-    Color: <input id="color" type="color" value="#000000"><br/>
+    <!--Color: <input id="color" type="color" value="#000000"><br/>-->
     <!--size of the brush -->
-    Brush size: <input id="size" type="range" min="1" max="100" step="1" value="20"><br/>
-    <!--brush opcacity -->
+    <!--Brush size: <input id="size" type="range" min="1" max="100" step="1" value="20"><br/>-->
+
     <!--Brush opacity: <input id="opacity" type="number" min="0" max="1" step="0.1" value="0.5"><br/>-->
 
     <!--canvas with cursor -->
@@ -70,18 +70,22 @@
       var socket = io();
 
       //set the new canvas to be able to draw
-      var canvas = new fabric.Canvas("draw", {
-      	isDrawingMode: true,
-        freeDrawingCursor: 'none'
+      var canvas = new fabric.StaticCanvas("draw", {
+
+      });
+
+      socket.on('receive data', function(data){
+        console.log(data);
+        canvas.loadFromJSON(data);
       });
 
       //get the cursor
       var cursor = new fabric.StaticCanvas("cursor");
 
       //initalize the brushes width and color
-      canvas.freeDrawingBrush.width = 20;
-      canvas.freeDrawingBrush.color = '#000000';
-
+      //canvas.freeDrawingBrush.width = 20;
+      //canvas.freeDrawingBrush.color = '#000000';
+/*
       //set cursorOpacity to 50%
       var cursorOpacity = .5;
       //make the mousecursor a circle with the below attributes
@@ -122,8 +126,7 @@
       });
 
       canvas.on('mouse:up', function(){
-        //console.log(JSON.stringify(canvas));
-        socket.emit('push data', JSON.stringify(canvas));
+        console.log(JSON.stringify(canvas));
       });
 
       //while brush size is changed
@@ -159,7 +162,7 @@
         fill[fill.length-1] = cursorOpacity + ")";
         mousecursor.fill = fill.join(",");
       };*/
-
+      /*
       //change drawing color
       document.getElementById("color").onchange = function () {
       	canvas.freeDrawingBrush.color = this.value;
