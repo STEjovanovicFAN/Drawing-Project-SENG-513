@@ -44,7 +44,8 @@
       <canvas id="draw" width="500" height="500"></canvas>
       <canvas id="cursor" width="500" height="500"></canvas>
     </div>
-    <h1>Your word is: <span id = word>null</span.</h1>
+    <h1>Your word is: <span id = word>null</span></h1>
+    <h1>Time left: <span id = time> </span></h1>
 
     <script>
       var socket = io();
@@ -55,6 +56,12 @@
       socket.on('recvWord', function(responce){
         word = responce;
         document.getElementById("word").innerHTML = word;
+      });
+
+      //get the current time left from the server and display it
+      socket.on('send current time', function(currentTime){
+        //console.log(currentTime);
+        document.getElementById("time").innerHTML = currentTime;
       });
 
       //set the new canvas to be able to draw

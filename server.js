@@ -16,6 +16,7 @@ var drawingWordsDictionary = ["pen", "jar","ocean","worm", "cloud", "fly", "loll
 "key", "coin", "hook", "arm", "computer", "lizard", "bee", "slide", "mitten", "rock", "head", "Mickey Mouse", "helicopter", "earth"];
 var totalClients = 0;
 var currentWord = " ";
+var time = 0;
 
 
 app.get('/', function(req, res){
@@ -23,6 +24,7 @@ app.get('/', function(req, res){
   if(totalClients === 0){
     res.sendFile(__dirname + '/drawingMode.html');
     totalClients ++;
+    startNewTimer();
   }
   else{
     res.sendFile(__dirname + '/listenClient.html');
@@ -30,6 +32,24 @@ app.get('/', function(req, res){
   }
 
 });
+
+//create a timer for 60 seconds, update clients every second (1000ms)
+function startNewTimer(){
+    time = 60;
+    //while timer is running, send the current time for this round
+    var timer = setInterval(function(){
+      if(time >= 0){
+        io.emit('send current time', time);
+        //console.log(time);
+        time --;
+      }
+      //if the time is < 0, stop the timer and handoff the drawing page to another player
+      else{
+        clearTimeout(timer);
+      }
+    }, 1000);
+}
+
 
 //check if the user is connected or disconnected
 io.on('connection', function(socket){
@@ -45,17 +65,17 @@ io.on('connection', function(socket){
   //if server gets data broadcast it to all clients
   socket.on('push data', function(data){
     io.emit('receive data', data);
-    console.log("pushed the dtat to clients");
+    //console.log("pushed the data to clients");
   });
 
   socket.on('word guess', function(guess){
     var userGuess = guess.toLowerCase();
 
     if(userGuess === currentWord){
-      console.log("you guessed coredasdjdska");
+      console.log("you guessed correctly");
     }
     else{
-      console.log("you fucked up phaggot");
+      console.log("you fucked up");
     }
   });
 

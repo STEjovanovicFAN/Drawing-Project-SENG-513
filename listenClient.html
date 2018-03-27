@@ -42,6 +42,9 @@
     <div id="cont">
       <canvas id="draw" width="500" height="500"></canvas>
     </div>
+
+    <h1>Time left: <span id = time> </span></h1>
+
     <form action="">
       <input id="m" autocomplete="off" />
       <button>Send</button>
@@ -54,6 +57,12 @@
       //set the new canvas to be able to draw
       var canvas = new fabric.StaticCanvas("draw", {
 
+      });
+
+      //get the current time left from the server and display it
+      socket.on('send current time', function(currentTime){
+        //console.log(currentTime);
+        document.getElementById("time").innerHTML = currentTime;
       });
 
       socket.on('receive data', function(data){
