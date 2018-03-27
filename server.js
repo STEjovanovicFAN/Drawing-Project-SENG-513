@@ -18,7 +18,6 @@ var totalClients = 0;
 var currentWord = " ";
 var time = 0;
 
-
 app.get('/', function(req, res){
   //res.sendFile(__dirname + '/fabric.js');
   if(totalClients === 0){
@@ -30,7 +29,6 @@ app.get('/', function(req, res){
     res.sendFile(__dirname + '/listenClient.html');
     totalClients ++;
   }
-
 });
 
 //create a timer for 60 seconds, update clients every second (1000ms)
