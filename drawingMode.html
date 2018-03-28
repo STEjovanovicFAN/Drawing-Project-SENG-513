@@ -50,7 +50,24 @@
     <script>
       var socket = io();
       var word;
+      var userID;
       socket.emit('getDrawingWord');
+
+      //get this sockets id
+      socket.on('pushSocketID', function(thisUserID){
+        userID = thisUserID;
+        console.log(userID);
+      });
+
+      //when changing mode happens
+      socket.on('changingDrawingMode', function(recvID){
+        if(recvID === userID){
+          console.log("I am now drawing");
+        }
+        else{
+          console.log("I am now listening");
+        }
+      });
 
       //listen for a responce from server for the word you have to draw
       socket.on('recvWord', function(responce){
@@ -62,28 +79,7 @@
       socket.on('send current time', function(currentTime){
         //console.log(currentTime);
         document.getElementById("time").innerHTML = currentTime;
-
-        //if the timer has expired do a new http reuqest for a listerner client
-        if(currentTime === 0){
-          console.log("yes");
-          //if timer has expired 
-          window.location.href = "";
-          //httpGetAsync("localhost:3000")
-        }
       });
-/*
-      //make a new http reuqest
-      function httpGetAsync(theUrl, callback)
-      {
-          console.log("no");
-          var xmlHttp = new XMLHttpRequest();
-          xmlHttp.onreadystatechange = function() {
-              if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-                  callback(xmlHttp.responseText);
-          }
-          xmlHttp.open("GET", theUrl, true); // true for asynchronous
-          xmlHttp.send(null);
-      }*/
 
       //set the new canvas to be able to draw
       var canvas = new fabric.Canvas("draw", {

@@ -22,100 +22,27 @@ var totalClients = 0;
 
 app.get('/', function(req, res){
   //res.sendFile(__dirname + '/fabric.js');
-  if( true){//totalClients === 0){
-    res.sendFile(__dirname + '/drawingMode.html');
-    totalClients ++;
-    if(totalClients == 1){
-      startNewTimer();
-    }
+//  if( true){//totalClients === 0){
+    res.sendFile(__dirname + '/testHTMLPage.html');
+  //  totalClients ++;
+    //if(totalClients == 1){
+      //startNewTimer();
+    /*}
   }
   else{
     res.sendFile(__dirname + '/listenClient.html');
     totalClients ++;
-  }
+  }*/
 });
 
-//create a timer for 60 seconds, update clients every second (1000ms)
-function startNewTimer(){
-    time = 20;
-    //while timer is running, send the current time for this round
-    var timer = setInterval(function(){
-      if(time >= 0){
-        io.emit('send current time', time);
-        //console.log(time);
-        time --;
-      }
-      //if the time is < 0, stop the timer and handoff the drawing page to another player
-      else{
-        clearTimeout(timer);
 
-        //boradcast to all the rest of the sockets what they are now
-        var i = users[0];
-        users.splice(0, 1);
-        users.push(i);
-
-        var i = users[0].user;
-
-        io.emit('changingDrawingMode', i);
-        startNewTimer();
-      }
-    }, 1000);
-}
 
 
 //check if the user is connected or disconnected
 io.on('connection', function(socket){
   console.log("user has connected");
 
-  var user = {
-    "user" : countUsers,
-    "socketID" : socket.id
-  }
 
-  socket.emit('pushSocketID', countUsers);
-
-  countUsers++;
-  users.push(user);
-
-  //when the user disconnects take him off the onlineUser list
-  socket.on('disconnect', function(){
-    console.log('user disconnected');
-    //totalClients--;
-
-  });
-
-  //if server gets data broadcast it to all clients
-  socket.on('push data', function(data){
-    io.emit('receive data', data);
-    //console.log("pushed the data to clients");
-  });
-
-  socket.on('word guess', function(guess){
-    var userGuess = guess.toLowerCase();
-
-    if(userGuess === currentWord){
-      console.log("you guessed correctly");
-    }
-    else{
-      console.log("you fucked up");
-    }
-  });
-
-  //get a random word and give it to the drawer
-  socket.on('getDrawingWord', function(){
-    //choose a random word
-    var item = drawingWordsDictionary[Math.floor(Math.random()*drawingWordsDictionary.length)];
-    currentWord = item.toLowerCase();
-
-    //delete the random word from the dictionary
-    var index = drawingWordsDictionary.indexOf(item);
-    if(index > -1){
-      drawingWordsDictionary.splice(index, 1);
-    }
-
-    //give the word to the drawer
-    socket.emit('recvWord', item);
-  });
 
 });
 
