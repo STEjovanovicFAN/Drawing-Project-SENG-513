@@ -19,6 +19,7 @@ var currentWord = " ";
 var countUsers = 0;
 var time = 0;
 var totalClients = 0;
+var currentDrawingID;
 
 app.get('/', function(req, res){
   //res.sendFile(__dirname + '/fabric.js');
@@ -54,13 +55,20 @@ function startNewTimer(){
         users.splice(0, 1);
         users.push(i);
 
+        currentDrawingID = users[0].user;
+
         var i = users[0].user;
 
-        io.emit('changingDrawingMode', i);
+        io.emit('whosDrawing', i);
         startNewTimer();
       }
     }, 1000);
 }
+
+//send id of whos drawing
+io.on('getWhosDrawing', function (){
+  socket.emit('whosDrawing', currentDrawingUser);
+});
 
 
 //check if the user is connected or disconnected

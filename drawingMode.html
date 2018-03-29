@@ -26,6 +26,9 @@
       #cursor {
       pointer-events: none!important;
       }
+      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
     </style>
 
     <!-- add jquery-->
@@ -34,24 +37,31 @@
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
   </head>
   <body>
+
+    <div id = "outer">
+
+
+      <div id = "inner">
+      </div>
+    </div>
+
     <!--color of the brush -->
-    Color: <input id="color" type="color" value="#000000"><br/>
+    <!--Color: <input id="color" type="color" value="#000000"><br/>-->
     <!--size of the brush -->
-    Brush size: <input id="size" type="range" min="1" max="100" step="1" value="20"><br/>
+    <!--Brush size: <input id="size" type="range" min="1" max="100" step="1" value="20"><br/>-->
 
     <!--canvas with cursor -->
-    <div id="cont">
+    <!--<div id="cont">
       <canvas id="draw" width="500" height="500"></canvas>
       <canvas id="cursor" width="500" height="500"></canvas>
     </div>
     <h1>Your word is: <span id = word>null</span></h1>
-    <h1>Time left: <span id = time> </span></h1>
+    <h1>Time left: <span id = time> </span></h1>-->
 
     <script>
       var socket = io();
       var word;
       var userID;
-      socket.emit('getDrawingWord');
 
       //get this sockets id
       socket.on('pushSocketID', function(thisUserID){
@@ -59,15 +69,75 @@
         console.log(userID);
       });
 
-      //when changing mode happens
-      socket.on('changingDrawingMode', function(recvID){
-        if(recvID === userID){
+      //get the person whos drawing
+      socket.emit('getWhosDrawing');
+
+      //set your divs to be who you are
+      socket.on('whosDrawing', function(currentDrawingUser){
+        //if you are drawing load elements to draw
+        if(currentDrawingUser === userID){
+          $('#outer').empty();
+
           console.log("I am now drawing");
+          $('#outer').append('Color: <input id="color" type="color" value="#000000"><br/>')
+          .append('Brush size: <input id="size" type="range" min="1" max="100" step="1" value="20"><br/>')
+          .append('<h1>Your word is: <span id = word>null</span></h1>')
+          .append('<h1>Time left: <span id = time> </span></h1>');
+          //.append('<div id="inner"></div>');
+
+          $('#outer').append('<div id="cont"> <canvas id="draw" width="500" height="500"></canvas> <canvas id="cursor" width="500" height="500"></canvas></div>');
+
+
+          drawingModeClient();
+
         }
+        //otherwise you are the listener
         else{
-          console.log("I am now listening");
+          $('#outer').empty();
+
+          console.log("I am not listening");
+          $('#outer').append('<h1>Time left: <span id = time> </span></h1>')
+          $('#outer').append('<form action=""><input id="m" autocomplete="off" /><button>Send</button></form>')
+          $('#outer').append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>')
+
+          listenerModeClient();
+
         }
       });
+
+function listenerModeClient(){
+      var canvas = new fabric.StaticCanvas("draw", {
+
+      });
+
+      //get the current time left from the server and display it
+      socket.on('send current time', function(currentTime){
+        //console.log(currentTime);
+        document.getElementById("time").innerHTML = currentTime;
+      });
+
+      socket.on('receive data', function(data){
+        console.log(data);
+        canvas.loadFromJSON(data);
+      });
+
+      //get the cursor
+      var cursor = new fabric.StaticCanvas("cursor");
+
+      //send message to the server with name and color
+      $('form').submit(function(){
+        socket.emit('word guess', $('#m').val());
+        $('#m').val('');
+        return false;
+      });
+}
+
+
+
+
+function drawingModeClient(){
+      //get the drawing word
+      socket.emit('getDrawingWord');
 
       //listen for a responce from server for the word you have to draw
       socket.on('recvWord', function(responce){
@@ -173,6 +243,7 @@
         var b = bigint & 255;
         //mousecursor.fill = "rgba(" + [r,g,b,cursorOpacity].join(",") + ")";
       };
+    }
     </script>
 
   </body>
