@@ -19,7 +19,7 @@ var currentWord = " ";
 var countUsers = 0;
 var time = 0;
 var totalClients = 0;
-var currentDrawingID;
+var currentDrawingID = " ";
 
 app.get('/', function(req, res){
   //res.sendFile(__dirname + '/fabric.js');
@@ -27,13 +27,10 @@ app.get('/', function(req, res){
     res.sendFile(__dirname + '/drawingMode.html');
     totalClients ++;
     if(totalClients == 1){
-      startNewTimer();
+      //startNewTimer();
     }
   }
-  else{
-    res.sendFile(__dirname + '/listenClient.html');
-    totalClients ++;
-  }
+
 });
 
 //create a timer for 60 seconds, update clients every second (1000ms)
@@ -79,11 +76,21 @@ io.on('connection', function(socket){
     "user" : countUsers,
     "socketID" : socket.id
   }
-
+  //give socket its id
   socket.emit('pushSocketID', countUsers);
 
+  //if socket is the first one start timer, give it drawing page
+  if(countUsers === 0){
+    currentDrawingID = countUsers;
+    socket.emit('whosDrawing', currentDrawingID);
+    startNewTimer();
+  }
+  else{
+    socket.emit('whosDrawing', currentDrawingID);
+  }
   countUsers++;
   users.push(user);
+
 
   //when the user disconnects take him off the onlineUser list
   socket.on('disconnect', function(){
@@ -105,7 +112,7 @@ io.on('connection', function(socket){
       console.log("you guessed correctly");
     }
     else{
-      console.log("you fucked up");
+      console.log("you guessed wrong");
     }
   });
 

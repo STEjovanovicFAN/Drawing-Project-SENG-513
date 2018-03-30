@@ -117,7 +117,7 @@ function listenerModeClient(){
       });
 
       socket.on('receive data', function(data){
-        console.log(data);
+        //console.log(data);
         canvas.loadFromJSON(data);
       });
 
@@ -132,12 +132,12 @@ function listenerModeClient(){
       });
 }
 
-
-
-
 function drawingModeClient(){
       //get the drawing word
       socket.emit('getDrawingWord');
+
+      //variable that controls how offen we send packets to Server
+      //var breakPoint = 0;
 
       //listen for a responce from server for the word you have to draw
       socket.on('recvWord', function(responce){
@@ -190,6 +190,16 @@ function drawingModeClient(){
           })
           .setCoords()
       	  .canvas.renderAll();
+/*
+          //determine if we need to broadcast event to server
+          if(breakPoint === 10){
+            console.log("mouse moving");
+            breakPoint = 0;
+            document.elementFromPoint(x, y).click();
+          }
+          else{
+            breakPoint++;
+          }*/
       });
 
       canvas.on('mouse:out', function () {
