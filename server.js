@@ -23,13 +23,8 @@ var currentDrawingID = " ";
 
 app.get('/', function(req, res){
   //res.sendFile(__dirname + '/fabric.js');
-  if( true){//totalClients === 0){
+
     res.sendFile(__dirname + '/drawingMode.html');
-    totalClients ++;
-    if(totalClients == 1){
-      //startNewTimer();
-    }
-  }
 
 });
 
@@ -58,6 +53,7 @@ function startNewTimer(){
 
         io.emit('whosDrawing', i);
         startNewTimer();
+        console.log(users);
       }
     }, 1000);
 }
@@ -92,11 +88,17 @@ io.on('connection', function(socket){
   users.push(user);
 
 
-  //when the user disconnects take him off the onlineUser list
+  //when the user disconnects take him out of the queue
   socket.on('disconnect', function(){
     console.log('user disconnected');
-    //totalClients--;
 
+    //get the index and take this user out of the list
+    var index = users.findIndex(x => x.socketID===socket.id);
+    users.splice(index,1);
+
+    //console.log(socket);
+    console.log(index);
+    console.log(users);
   });
 
   //if server gets data broadcast it to all clients
