@@ -53,7 +53,6 @@ function startNewTimer(){
 
         io.emit('whosDrawing', i);
         startNewTimer();
-        console.log(users);
       }
     }, 1000);
 }
@@ -96,9 +95,6 @@ io.on('connection', function(socket){
     var index = users.findIndex(x => x.socketID===socket.id);
     users.splice(index,1);
 
-    //console.log(socket);
-    console.log(index);
-    console.log(users);
   });
 
   //if server gets data broadcast it to all clients
