@@ -21,9 +21,8 @@ var time = 0;
 var totalClients = 0;
 var currentDrawingID = " ";
 
+//render html page on load
 app.get('/', function(req, res){
-  //res.sendFile(__dirname + '/fabric.js');
-
     res.sendFile(__dirname + '/drawingMode.html');
 
 });
@@ -41,17 +40,25 @@ function startNewTimer(){
       //if the time is < 0, stop the timer and handoff the drawing page to another player
       else{
         clearTimeout(timer);
+        //if there are no users connected
+        if(users.length === 0){
+          //do nothing
+        }
 
-        //boradcast to all the rest of the sockets what they are now
-        var i = users[0];
-        users.splice(0, 1);
-        users.push(i);
+        //otherwise continue with program
+        else{
 
-        currentDrawingID = users[0].user;
+          //boradcast to all the rest of the sockets what they are now
+          var i = users[0];
+          users.splice(0, 1);
+          users.push(i);
+          //store current drawing user
+          currentDrawingID = users[0].user;
 
-        var i = users[0].user;
-
-        io.emit('whosDrawing', i);
+          //emit who the current drawing user is
+          var i = users[0].user;
+          io.emit('whosDrawing', i);
+        }
         startNewTimer();
       }
     }, 1000);
@@ -66,7 +73,7 @@ io.on('getWhosDrawing', function (){
 //check if the user is connected or disconnected
 io.on('connection', function(socket){
   console.log("user has connected");
-
+  //create a new user object
   var user = {
     "user" : countUsers,
     "socketID" : socket.id
@@ -80,12 +87,14 @@ io.on('connection', function(socket){
     socket.emit('whosDrawing', currentDrawingID);
     startNewTimer();
   }
+  //otherwise give the socket whos currently drawing
   else{
     socket.emit('whosDrawing', currentDrawingID);
   }
+  //update users and push this new user into our drawing queue
+  //
   countUsers++;
   users.push(user);
-
 
   //when the user disconnects take him out of the queue
   socket.on('disconnect', function(){
@@ -103,6 +112,7 @@ io.on('connection', function(socket){
     //console.log("pushed the data to clients");
   });
 
+  //guessing for a word
   socket.on('word guess', function(guess){
     var userGuess = guess.toLowerCase();
 

@@ -29,6 +29,9 @@
       form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
       form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
       form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+
+
+
     </style>
 
     <!-- add jquery-->
@@ -39,8 +42,7 @@
   <body>
 
     <div id = "outer">
-      <div id = "inner">
-      </div>
+
     </div>
 
     <!--color of the brush -->
@@ -82,7 +84,6 @@
           .append('Brush size: <input id="size" type="range" min="1" max="100" step="1" value="20"><br/>')
           .append('<h1>Your word is: <span id = word>null</span></h1>')
           .append('<h1>Time left: <span id = time> </span></h1>');
-          //.append('<div id="inner"></div>');
 
           $('#outer').append('<div id="cont"> <canvas id="draw" width="500" height="500"></canvas> <canvas id="cursor" width="500" height="500"></canvas></div>');
 
