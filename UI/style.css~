@@ -1,3 +1,11 @@
+/*#587291 - Gray
+#2F97C1 - Blue
+#1CCAD8 - Light Blue
+#15E6CD - Teal
+#0CF574 - Green
+*/
+
+
 body {
     font: 24px Helvetica;
     background: red;

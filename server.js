@@ -24,7 +24,7 @@ var currentDrawingID = " ";
 //render html page on load
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/drawingMode.html');
-
+    res.sendFile(__dirname + '/DrawJS.js');
 });
 
 //create a timer for 60 seconds, update clients every second (1000ms)
