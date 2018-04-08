@@ -24,6 +24,10 @@ var currentDrawingID = " ";
 //render html page on load
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/drawingMode.html');
+});
+
+//when page asks for DrawJS.js give it to the client
+app.get('/DrawJS.js', function(req, res){
     res.sendFile(__dirname + '/DrawJS.js');
 });
 

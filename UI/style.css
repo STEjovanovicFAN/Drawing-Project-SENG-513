@@ -67,6 +67,7 @@ input[type="text"] {
 	  margin-bottom: 20px;
 	}
 }
+
 /* Too narrow to support three columns */
 @media all and (max-width: 640px) {
     #main, #page {

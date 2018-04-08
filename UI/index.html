@@ -10,95 +10,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
 
-    <style>
-    body {
-        font: 24px Helvetica;
-        background: red;
-        margin: 0px;
-    }
-    .navbar navbar-inverse{
-      background:red;
-      margin:0px;
-    }
-
-    #main {
-        background: #587291;
-        min-height: 300px;
-        margin: 0px;
-        padding: 0px;
-        display: flex;
-        flex-flow: row;
-    }
-
-    #main > article {
-        margin: 4px;
-        padding: 5px;
-        height: 800px;
-        background: #2F97C1;
-        flex: 3 1 60%;
-        order: 2;
-    }
-
-    #main > aside {
-        margin: 4px;
-        padding: 5px;
-        background: #1CCAD8;
-        flex: 1 6 20%;
-        order: 3;
-    }
-    #navbar>#logout-button{
-      float: right;
-      background: red;
-    }
-
-    header, footer {
-        display: block;
-        margin: 4px;
-        padding: 5px;
-        min-height: 100px;
-        background: #15E6CD;
-    }
-
-    .wrapper {
-    	margin-top: 80px;
-      margin-bottom: 80px;
-    }
-    .form-signin {
-      max-width: 380px;
-      padding: 15px 35px 45px;
-      margin: auto;
-      background-color: #fff;
-      border: 1px solid rgba(0,0,0,0.1);
-    }
-
-    input[type="text"] {
-      margin-bottom: 20px;
-
-    }
-
-    	input[type="password"] {
-    	  margin-bottom: 20px;
-    	}
-    }
-    /* Too narrow to support three columns */
-    @media all and (max-width: 640px) {
-        #main, #page {
-            flex-direction: column;
-        }
-
-        #main > article, #main > nav, #main > aside {
-        /* Return them to document order */
-            order: 0;
-        }
-
-        #main > nav, #main > aside, header, footer {
-            min-height: 50px;
-            max-height: 50px;
-        }
-    }
-
-    </style>
-
     <!-- add bootstrap-->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -147,8 +58,7 @@
     </div>
     <footer>footer</footer>
 
-    <script>
-    
-    </script>
+    <!--run the drawing functionality after everything is loaded-->
+    <script type="text/javascript" src="DrawJS.js"></script>
   </body>
 </html>
