@@ -36,8 +36,7 @@ socket.on('whosDrawing', function(currentDrawingUser){
     console.log("I am not listening");
     console.log("currentDrawingUser: " + currentDrawingUser);
     $('#outer').append('<h1>Time left: <span id = time> </span></h1>')
-    $('#outer').append('<form action=""><input id="m" autocomplete="off" /><button>Send</button></form>')
-    $('#outer').append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>')
+    $('#outer').append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>');
 
     listenerModeClient();
 
