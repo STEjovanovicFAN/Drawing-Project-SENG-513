@@ -55,10 +55,11 @@ function DisplayCurrentTime() {
 	var seconds = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
 	time = hours + ":" + minutes + ":" + seconds;
 	return time;
-};
+}
 
 //create a timer for 60 seconds, update clients every second (1000ms)
 function startNewTimer(){
+		console.log("i reset the timer");
     time = 20;
     //while timer is running, send the current time for this round
     var timer = setInterval(function(){
@@ -74,10 +75,8 @@ function startNewTimer(){
         if(drawUsers.length === 0){
           //do nothing
         }
-
         //otherwise continue with program
         else{
-
           //boradcast to all the rest of the sockets what they are now
           var i = drawUsers[0];
           drawUsers.splice(0, 1);
@@ -101,7 +100,7 @@ io.on('getWhosDrawing', function (){
 
 io.on('connection', function(socket){
 	//create a new user object
-  var user = {
+  var user1 = {
     "user" : countUsers,
     "socketID" : socket.id
   }
@@ -118,23 +117,23 @@ io.on('connection', function(socket){
   else{
     socket.emit('whosDrawing', currentDrawingID);
   }
-  //update users and push this new user into our drawing queue
-  //
-  countUsers++;
-  drawUsers.push(user);
 
+	console.log(countUsers);
+  //update users and push this new user into our drawing queue
+  countUsers++;
+  drawUsers.push(user1);
 
 	io.emit('updateOnlineList', users);
 	io.emit('updateHistory', messages);
-	console.log(sockets.includes(socket.id));
+	//console.log(sockets.includes(socket.id));
 	sockets.push(socket.id);
-	console.log(sockets);
+	//console.log(sockets);
 
 	socket.on('chat message', function(msg){
 		msg.time = DisplayCurrentTime();
 		messages.push(msg);
-		io.emit('chat message', msg);
-		console.log(messages);
+		io.emit('chat message1', msg);
+		//console.log(msg);
 	});
 
 	socket.on('updateUsers', function (userPref) {
@@ -173,13 +172,13 @@ io.on('connection', function(socket){
 
 	//UPDATE PREFS HERE
 	socket.on('updatePrefs', function (update) {
-		console.log("GOTHERE");
+		//console.log("GOTHERE");
 		for(i=0; i < users.length; i++){
 			if(users[i]['name'] === update.oldName)
 				users[i] = update.userPref;
 		}
 		io.emit('updateOnlineList', users);
-		console.log(users);
+		//console.log(users);
 	});
 
 	//if server gets data broadcast it to all clients
@@ -199,22 +198,6 @@ io.on('connection', function(socket){
       console.log("you guessed wrong");
     }
   });
-
-	//get a random word and give it to the drawer
-	socket.on('getDrawingWord', function(){
-		//choose a random word
-		var item = drawingWordsDictionary[Math.floor(Math.random()*drawingWordsDictionary.length)];
-		currentWord = item.toLowerCase();
-
-		//delete the random word from the dictionary
-		var index = drawingWordsDictionary.indexOf(item);
-		if(index > -1){
-			drawingWordsDictionary.splice(index, 1);
-		}
-
-		//give the word to the drawer
-		socket.emit('recvWord', item);
-	});
 
 });
 

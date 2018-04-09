@@ -3,7 +3,7 @@ var socket = io();
 var userPref = new Array();
 
 $('form').submit(function(){
-
+	//event.preventDefault();
 	if($('#m').val().startsWith("\\nickcolor")){
 		oldName = userPref.name;
 		userPref.color= '#' + $('#m').val().split(" ")[1];
@@ -31,13 +31,13 @@ $('form').submit(function(){
 		document.getElementById("users").innerHTML='';
 		for(i = 0; i < users.length; i++)
 			$('#users').append($('<li>' + users[i].name + '</li>'));
-		console.log(users);
+		//console.log(users);
 	});
 
 	socket.on('updateHistory', function(messages){
 
-		console.log("GOTHEA");
-		console.log(messages);
+		//console.log("GOTHEA");
+		//console.log(messages);
 
 		for(i = 0; i < messages.length; i++){
 			if(messages[i].sender.name === userPref.name){
@@ -56,9 +56,7 @@ $('form').submit(function(){
 
 	});
 
-
-
-	socket.on('chat message', function(msg){
+	socket.on('chat message1', function(msg){
 		if(msg.sender.name === userPref.name){
 			$('#messages').append($('<li><strong><span style="color:' +
 			msg.sender.color + '">'+ '[' + msg.time + '] '+ msg.sender.name  + '</span>: '

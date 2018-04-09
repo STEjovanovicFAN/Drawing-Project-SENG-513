@@ -62,12 +62,12 @@ socket.on('receive data', function(data){
 //get the cursor
 var cursor = new fabric.StaticCanvas("cursor");
 
-//send message to the server with name and color
+/*//send message to the server with name and color
 $('form').submit(function(){
   socket.emit('word guess', $('#m').val());
   $('#m').val('');
   return false;
-});
+});*/
 }
 
 function drawingModeClient(){
