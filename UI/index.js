@@ -47,7 +47,7 @@ app.get('/chat.js', function(req, res){
 app.get('/DrawJS.js', function(req, res){
     res.sendFile(__dirname + '/DrawJS.js');
 });
-
+/*
 function DisplayCurrentTime() {
 	var date = new Date();
 	var hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
@@ -55,11 +55,11 @@ function DisplayCurrentTime() {
 	var seconds = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
 	time = hours + ":" + minutes + ":" + seconds;
 	return time;
-}
+}*/
 
 //create a timer for 60 seconds, update clients every second (1000ms)
 function startNewTimer(){
-		console.log("i reset the timer");
+		//console.log("i reset the timer");
     time = 20;
     //while timer is running, send the current time for this round
     var timer = setInterval(function(){
@@ -123,6 +123,21 @@ io.on('connection', function(socket){
   countUsers++;
   drawUsers.push(user1);
 
+	socket.on('getDrawingWord', function(){
+    //choose a random word
+    var item = drawingWordsDictionary[Math.floor(Math.random()*drawingWordsDictionary.length)];
+    currentWord = item.toLowerCase();
+
+    //delete the random word from the dictionary
+    var index = drawingWordsDictionary.indexOf(item);
+    if(index > -1){
+      drawingWordsDictionary.splice(index, 1);
+    }
+
+    //give the word to the drawer
+    socket.emit('recvWord', item);
+  });
+/*
 	io.emit('updateOnlineList', users);
 	io.emit('updateHistory', messages);
 	//console.log(sockets.includes(socket.id));
@@ -144,16 +159,16 @@ io.on('connection', function(socket){
 	socket.on('updateOnlineList', function () {
 		io.emit('updateOnlineList', users);
 	});
-
+*/
 	socket.on('disconnect', function(){
-		users = [];
+		/*users = [];
 		io.emit('getUsers');
-
+*/
     //get the index and take this user out of the list
     var index = drawUsers.findIndex(x => x.socketID===socket.id);
     drawUsers.splice(index,1);
 	});
-
+/*
 	//set user
 	socket.on('setuser', function (user) {
 		userNum++;
@@ -179,7 +194,7 @@ io.on('connection', function(socket){
 		}
 		io.emit('updateOnlineList', users);
 		//console.log(users);
-	});
+	});*/
 
 	//if server gets data broadcast it to all clients
   socket.on('push data', function(data){
@@ -189,8 +204,7 @@ io.on('connection', function(socket){
 
 	//guessing for a word
   socket.on('word guess', function(guess){
-    var userGuess = guess.toLowerCase();
-
+		var userGuess = guess.toLowerCase();
     if(userGuess === currentWord){
       console.log("you guessed correctly");
     }
@@ -203,14 +217,14 @@ io.on('connection', function(socket){
 
 http.listen(port, function(){
 });
-
+/*
 function genName(){
 
 	let username = "user" + userNum;
 
 	return username;
-}
-
+}*/
+/*
 function randColor() {
 	var letters = '0123456789ABCDEF';
 	var color = '#';
@@ -218,4 +232,4 @@ function randColor() {
 	color += letters[Math.floor(Math.random() * 16)];
 	}
 	return color;
-}
+}*/

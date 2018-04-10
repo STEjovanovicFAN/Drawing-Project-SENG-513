@@ -2,6 +2,8 @@ var socket = io();
 var word;
 var userID;
 
+
+
 //get this sockets id
 socket.on('pushSocketID', function(thisUserID){
   userID = thisUserID;
@@ -14,7 +16,7 @@ socket.emit('getWhosDrawing');
 //set your divs to be who you are
 socket.on('whosDrawing', function(currentDrawingUser){
   //if you are drawing load elements to draw
-  if(currentDrawingUser === userID){
+  if(currentDrawingUser == userID){
     $('#outer').empty();
 
     console.log("I am now drawing");
@@ -26,6 +28,7 @@ socket.on('whosDrawing', function(currentDrawingUser){
 
     $('#outer').append('<div id="cont"> <canvas id="draw" width="500" height="500"></canvas> <canvas id="cursor" width="500" height="500"></canvas></div>');
 
+    $('#guessbox').empty();
     drawingModeClient();
 
   }
@@ -38,6 +41,21 @@ socket.on('whosDrawing', function(currentDrawingUser){
     $('#outer').append('<h1>Time left: <span id = time> </span></h1>')
     $('#outer').append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>');
 
+
+    $('#guessbox').empty();
+    $('#guessbox').append('My Guess <input type = "text" id = "myGuess">');
+    $('#guessbox').append('<button id = "submitGuess"> Submit Guess </button>');
+    var button = document.getElementById("submitGuess");
+
+    button.onclick = function(){
+      var guessText = document.getElementById("myGuess").value;
+
+      console.log("your word is: "+ guessText);
+      socket.emit('word guess', guessText);
+
+      //erase guess field
+      document.getElementById("myGuess").value = "";
+    }
     listenerModeClient();
 
   }

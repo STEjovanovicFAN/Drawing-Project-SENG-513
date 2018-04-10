@@ -16,7 +16,7 @@ socket.on('whosDrawing', function(currentDrawingUser){
   //if you are drawing load elements to draw
   if(currentDrawingUser === userID){
     $('#outer').empty();
-
+    console.log("page ready? ");
     console.log("I am now drawing");
     console.log("currentDrawingUser: " + currentDrawingUser);
     $('#outer').append('Color: <input id="color" type="color" value="#000000"><br/>')
@@ -26,6 +26,7 @@ socket.on('whosDrawing', function(currentDrawingUser){
 
     $('#outer').append('<div id="cont"> <canvas id="draw" width="500" height="500"></canvas> <canvas id="cursor" width="500" height="500"></canvas></div>');
 
+      $('#guess box').empty();
     drawingModeClient();
 
   }
@@ -36,18 +37,21 @@ socket.on('whosDrawing', function(currentDrawingUser){
     console.log("I am not listening");
     console.log("currentDrawingUser: " + currentDrawingUser);
     $('#outer').append('<h1>Time left: <span id = time> </span></h1>')
-    $('#outer').append('<form action=""><input id="m" autocomplete="off" /><button>Send</button></form>')
-    $('#outer').append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>')
-
+    //$('#outer').append('<form action=""><input id="m" autocomplete="off" /><button>Send</button></form>')
+    $('#outer').append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>');
+    console.log("hi there");
+    $('#outer').append('<h1>hello there</h1>');
     listenerModeClient();
 
   }
 });
-
 function listenerModeClient(){
+
 var canvas = new fabric.StaticCanvas("draw", {
 
 });
+
+
 
 //get the current time left from the server and display it
 socket.on('send current time', function(currentTime){
@@ -64,11 +68,11 @@ socket.on('receive data', function(data){
 var cursor = new fabric.StaticCanvas("cursor");
 
 //send message to the server with name and color
-$('form').submit(function(){
+/*$('form').submit(function(){
   socket.emit('word guess', $('#m').val());
   $('#m').val('');
   return false;
-});
+});*/
 }
 
 function drawingModeClient(){
@@ -191,5 +195,5 @@ document.getElementById("color").onchange = function () {
   var g = (bigint >> 8) & 255;
   var b = bigint & 255;
   //mousecursor.fill = "rgba(" + [r,g,b,cursorOpacity].join(",") + ")";
-};
+  };
 }
