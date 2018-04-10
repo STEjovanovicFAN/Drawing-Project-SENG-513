@@ -43,23 +43,46 @@ socket.on('whosDrawing', function(currentDrawingUser){
 
 
     $('#guessbox').empty();
-    $('#guessbox').append('My Guess <input type = "text" id = "myGuess">');
+    $('#guessbox').append('My Guess <input type = "text" onkeypress="checkForEnter(event)" id = "myGuess">');
     $('#guessbox').append('<button id = "submitGuess"> Submit Guess </button>');
+    $('#guessbox').append('<script> function checkForEnter(event){ if (event.which === 13){submitGuess();}}</script>');
+    /*
+    function checkForEnter(event){
+      console.log("someone typed");
+    }*/
+
     var button = document.getElementById("submitGuess");
 
-    button.onclick = function(){
-      var guessText = document.getElementById("myGuess").value;
-
-      console.log("your word is: "+ guessText);
-      socket.emit('word guess', guessText);
-
-      //erase guess field
-      document.getElementById("myGuess").value = "";
-    }
+    button.onclick = submitGuess;
     listenerModeClient();
 
   }
+
+  //$('#outer').append('<h1 id="scoreField"> Score: 0</h1>');
 });
+function submitGuess(){
+  var guessText = document.getElementById("myGuess").value;
+
+  console.log("your word is: "+ guessText);
+  socket.emit('word guess', guessText);
+
+  //erase guess field
+  document.getElementById("myGuess").value = "";
+};
+
+socket.on('correctGuess', function(score){
+  console.log("you were right");
+  $('#scoreField').empty()
+  .append('Score: ' + score);
+  /*
+  var button = document.getElementById("submitGuess");
+
+  button.onclick = function(){};
+
+  */
+  $('#guessbox').append('<h1> Congratulations! you guessed correctly</h1>');
+
+})
 
 function listenerModeClient(){
 var canvas = new fabric.StaticCanvas("draw", {

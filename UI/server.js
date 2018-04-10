@@ -21,6 +21,7 @@ var countUsers = 0;
 var time = 0;
 var totalClients = 0;
 var currentDrawingID = " ";
+var firstGuess = false;
 
 //chat variables
 let users = new Array();
@@ -88,6 +89,13 @@ function startNewTimer(){
           var i = drawUsers[0].user;
           io.emit('whosDrawing', i);
 
+					//reset the guess tracking
+					for(var j = 0; j < drawUsers.length; j++){
+						drawUsers[j].guessedCorrectly = false;
+						console.log(drawUsers[j].guessedCorrectly);
+					}
+					firstGuess = false;
+
         }
         startNewTimer();
       }
@@ -104,7 +112,8 @@ io.on('connection', function(socket){
   var user1 = {
     "user" : countUsers,
     "socketID" : socket.id,
-		"score" : 0
+		"score" : 0,
+		"guessedCorrectly" : false
   }
   //give socket its id
   socket.emit('pushSocketID', countUsers);
@@ -207,12 +216,28 @@ io.on('connection', function(socket){
 	//guessing for a word
   socket.on('word guess', function(guess){
 		var userGuess = guess.toLowerCase();
+		//if the guessed word is correct
     if(userGuess === currentWord){
       console.log("you guessed correctly");
-			let myid = socket.id;
+			var myid = socket.id;
 			var index = drawUsers.findIndex(x => x.socketID===socket.id);
-			drawUsers[index].score += 10;
-			io.to(myid).emit('correctGuess', drawUsers[index].score);
+
+			console.log(drawUsers[index].guessedCorrectly);
+			if(drawUsers[index].guessedCorrectly === false){
+				//console.log("user guessed correctly");
+				if(firstGuess == false){
+					//console.log("user hasn't guessed before, update score");
+					drawUsers[index].score += 20;
+					firstGuess = true;
+				}
+				else{
+					drawUsers[index].score += 10;
+				}
+				drawUsers[index].guessedCorrectly = true;
+				console.log(drawUsers[index].score);
+				io.to(myid).emit('correctGuess', drawUsers[index].score);
+			}
+
     }
     else{
       console.log("you guessed wrong");
