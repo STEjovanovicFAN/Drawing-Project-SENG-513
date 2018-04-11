@@ -113,10 +113,12 @@ io.on('connection', function(socket){
     "user" : countUsers,
     "socketID" : socket.id,
 		"score" : 0,
-		"guessedCorrectly" : false
+		"guessedCorrectly" : false,
+		"userName" : "tempUser" + countUsers
   }
-  //give socket its id
+  //give socket its id and name
   socket.emit('pushSocketID', countUsers);
+	socket.emit('pushSocketName', "tempUser" + countUsers);
 
   //if socket is the first one start timer, give it drawing page
   if(countUsers === 0){
@@ -216,7 +218,7 @@ io.on('connection', function(socket){
   });
 
 	//when the server gets the chat message
-	socket.on('chat message', function(message){
+	socket.on('chat message', function(message, msgUser){
 		//split the message by spaces
 		var list  = message.split(" ");
 		var listWord;
@@ -227,7 +229,7 @@ io.on('connection', function(socket){
 			pontentialGuess(listWord);
 		}
 		//send message to be broadcast in the chat
-		io.emit('broadcastMessage', message);
+		io.emit('broadcastMessage', message, msgUser);
 	});
 
 	//guessing for a word

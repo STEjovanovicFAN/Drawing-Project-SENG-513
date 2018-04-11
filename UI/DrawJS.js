@@ -1,13 +1,19 @@
 var socket = io();
 var word;
 var userID;
-
+var userName;
 
 
 //get this sockets id
 socket.on('pushSocketID', function(thisUserID){
   userID = thisUserID;
   console.log(userID);
+});
+
+//get this socket it's name
+socket.on('pushSocketName', function(thisUserName){
+  userName = thisUserName;
+  console.log(userName);
 });
 
 //get the person whos drawing
@@ -41,10 +47,9 @@ socket.on('whosDrawing', function(currentDrawingUser){
     $('#outer').append('<h1>Time left: <span id = time> </span></h1>')
     $('#outer').append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>');
 
-
     $('#guessbox').empty();
-    $('#guessbox').append('My Guess <input type = "text" onkeypress="checkForEnter(event)" id = "myGuess">');
-    $('#guessbox').append('<button id = "submitGuess"> Submit Guess </button>');
+    $('#guessbox').append('<input type = "text" onkeypress="checkForEnter(event)" id = "myGuess">');
+    $('#guessbox').append('<button id = "submitGuess">Send Message</button>');
     $('#guessbox').append('<script> function checkForEnter(event){ if (event.which === 13){submitGuess();}}</script>');
     /*
     function checkForEnter(event){
@@ -216,7 +221,7 @@ function submitGuess(){
   var guessText = document.getElementById("myGuess").value;
 
   console.log("your word is: "+ guessText);
-  socket.emit('chat message', guessText);
+  socket.emit('chat message', guessText, userName);
 
   //erase guess field
   document.getElementById("myGuess").value = "";
@@ -232,12 +237,12 @@ socket.on('correctGuess', function(score){
   button.onclick = function(){};
 
   */
-  $('#guessbox').append('<h1> Congratulations! you guessed correctly</h1>');
+  $('#guessbox').append('<h1>Congratulations! you guessed correctly</h1>');
 
 })
 
 //when given a client message broadcast it to the side
-socket.on('broadcastMessage', function(givenMessage){
+socket.on('broadcastMessage', function(givenMessage, msgUser){
   console.log(givenMessage);
-  $('#messages').append('<li>' + givenMessage + '</li>');
+  $('#messages').append('<li>' + msgUser +": "+ givenMessage + '</li>');
 });
