@@ -2,6 +2,7 @@ var socket = io();
 var word;
 var userID;
 var userName;
+var userColor;
 
 
 //get this sockets id
@@ -13,7 +14,16 @@ socket.on('pushSocketID', function(thisUserID){
 //get this socket it's name
 socket.on('pushSocketName', function(thisUserName){
   userName = thisUserName;
+  //show to user on a visual display
+  document.getElementById('usersName').innerHTML=userName;
   console.log(userName);
+});
+
+//listen for this clients color, and update the html element for it
+socket.on('thisUserColor', function(thisUserColor){
+  userColor = thisUserColor;
+  console.log(userColor);
+  $('#usersName').css('color', userColor);
 });
 
 //get the person whos drawing
@@ -216,12 +226,11 @@ function listenerModeClient(){
   };
 }
 
-
 function submitGuess(){
   var guessText = document.getElementById("myGuess").value;
 
   console.log("your word is: "+ guessText);
-  socket.emit('chat message', guessText, userName);
+  socket.emit('chat message', guessText, userName, userColor);
 
   //erase guess field
   document.getElementById("myGuess").value = "";
@@ -242,7 +251,13 @@ socket.on('correctGuess', function(score){
 })
 
 //when given a client message broadcast it to the side
-socket.on('broadcastMessage', function(givenMessage, msgUser){
+socket.on('broadcastMessage', function(givenMessage, msgUser, msgColor, timeGiven){
   console.log(givenMessage);
-  $('#messages').append('<li>' + msgUser +": "+ givenMessage + '</li>');
+
+  $('#messages').append('<li>' + '<font color =' + msgColor + '>' + timeGiven + msgUser + ": "+ '</font>' +  givenMessage + '</li>');
+});
+
+//listen for server messages and print them on the chat
+socket.on('serverMessage', function(userCorctGuess, serverMsg, usersMsgColor){
+  $('#messages').append('<li>' + '<i>' + '<font color =' + usersMsgColor + '>' + userCorctGuess +'</font>' +  serverMsg + '</i>' + '</li>');
 });

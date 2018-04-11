@@ -23,11 +23,13 @@ var totalClients = 0;
 var currentDrawingID = " ";
 var firstGuess = false;
 
+/*
 //chat variables
 let users = new Array();
 let messages = new Array();
 let userNum = 0;
 let sockets = new Array();
+*/
 
 //give client html Page on load
 app.get('/', function(req, res){
@@ -48,20 +50,11 @@ app.get('/chat.js', function(req, res){
 app.get('/DrawJS.js', function(req, res){
     res.sendFile(__dirname + '/DrawJS.js');
 });
-/*
-function DisplayCurrentTime() {
-	var date = new Date();
-	var hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
-	var minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
-	var seconds = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
-	time = hours + ":" + minutes + ":" + seconds;
-	return time;
-}*/
 
 //create a timer for 60 seconds, update clients every second (1000ms)
 function startNewTimer(){
 		//console.log("i reset the timer");
-    time = 20;
+    time = 60;
     //while timer is running, send the current time for this round
     var timer = setInterval(function(){
       if(time >= 0){
@@ -92,7 +85,7 @@ function startNewTimer(){
 					//reset the guess tracking
 					for(var j = 0; j < drawUsers.length; j++){
 						drawUsers[j].guessedCorrectly = false;
-						console.log(drawUsers[j].guessedCorrectly);
+						//console.log(drawUsers[j].guessedCorrectly);
 					}
 					firstGuess = false;
 
@@ -108,17 +101,20 @@ io.on('getWhosDrawing', function (){
 });
 
 io.on('connection', function(socket){
+	var thisUserColor = randColor();
 	//create a new user object
   var user1 = {
     "user" : countUsers,
     "socketID" : socket.id,
 		"score" : 0,
 		"guessedCorrectly" : false,
-		"userName" : "tempUser" + countUsers
+		"userName" : "tempUser" + countUsers,
+		"color" : thisUserColor
   }
-  //give socket its id and name
+  //give socket its id and name and color
   socket.emit('pushSocketID', countUsers);
 	socket.emit('pushSocketName', "tempUser" + countUsers);
+	socket.emit('thisUserColor', thisUserColor);
 
   //if socket is the first one start timer, give it drawing page
   if(countUsers === 0){
@@ -218,49 +214,96 @@ io.on('connection', function(socket){
   });
 
 	//when the server gets the chat message
-	socket.on('chat message', function(message, msgUser){
+	socket.on('chat message', function(message, msgUser, msgColor){
 		//split the message by spaces
 		var list  = message.split(" ");
 		var listWord;
 
+		var getSeversMSG = " ";
 		//for each item in this array check if it is the guessed word
 		for(var i = 0; i < list.length; i++){
 			listWord = list[i];
-			pontentialGuess(listWord);
+			var checkVar = pontentialGuess(listWord);
+			//check if it returns an empty string, if not that is the message you need to broadcast
+			if(checkVar !== " "){
+				getSeversMSG = checkVar;
+			}
+
+			//if the listword is correct guessed word censor it
+			var wordInLowerCase = listWord.toLowerCase();
+			if(wordInLowerCase === currentWord){
+				//create the length and text of the censored word
+				var censorWord ="";
+				for(var z = 0; z < currentWord.length; z++){
+					censorWord = censorWord + "*";
+				}
+				list[i] = censorWord;
+			}
 		}
+
+		//console.log(list);
+		//get the current time
+		var currTime = DisplayCurrentTime();
+		//make the list back into a string
+		var joinedString = list.join(" ");
+
 		//send message to be broadcast in the chat
-		io.emit('broadcastMessage', message, msgUser);
+		io.emit('broadcastMessage', joinedString, msgUser, msgColor, currTime);
+
+		//broadcast the server message stating that this user guessed correctly
+		if(getSeversMSG !== " "){
+			io.emit('serverMessage',msgUser, getSeversMSG, msgColor);
+		}
 	});
 
 	//guessing for a word
   function pontentialGuess(guess){
 		var userGuess = guess.toLowerCase();
 		//if the guessed word is correct
+		var serverMSG;
     if(userGuess === currentWord){
-      console.log("you guessed correctly");
+      //console.log("you guessed correctly");
 			var myid = socket.id;
 			var index = drawUsers.findIndex(x => x.socketID===socket.id);
 
-			console.log(drawUsers[index].guessedCorrectly);
+			//console.log(drawUsers[index].guessedCorrectly);
 			if(drawUsers[index].guessedCorrectly === false){
 				//console.log("user guessed correctly");
 				if(firstGuess == false){
 					//console.log("user hasn't guessed before, update score");
 					drawUsers[index].score += 20;
 					firstGuess = true;
+
+					//format the server text message
+					var getUserName = drawUsers[index].userName;
+					serverMSG = " guessed the word correctly! 20 points awarded for being the first to guess the word!";
+
 				}
 				else{
 					drawUsers[index].score += 10;
+					var getUserName = drawUsers[index].userName;
+					serverMSG = " guessed the word correctly!";
+
 				}
 				drawUsers[index].guessedCorrectly = true;
 				console.log(drawUsers[index].score);
+
+				//need to change this emit statement
 				io.to(myid).emit('correctGuess', drawUsers[index].score);
+			}
+			//if already guessed do nothing but format the serverMSG
+			else{
+  			serverMSG = " ";
 			}
 
     }
     else{
-      console.log("you guessed wrong");
+      //console.log("you guessed wrong");
+			serverMSG = " ";
     }
+
+		//return message from sever
+		return serverMSG;
   }
 
 });
@@ -274,7 +317,7 @@ function genName(){
 
 	return username;
 }*/
-/*
+
 function randColor() {
 	var letters = '0123456789ABCDEF';
 	var color = '#';
@@ -282,4 +325,13 @@ function randColor() {
 	color += letters[Math.floor(Math.random() * 16)];
 	}
 	return color;
-}*/
+}
+//function that grabs the current time and formats it
+function DisplayCurrentTime() {
+	var date = new Date();
+	var hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+	var minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+	//var seconds = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
+	returnTime = "[" + hours + ":" + minutes + "] "; //":"// + seconds;
+	return returnTime;
+}
