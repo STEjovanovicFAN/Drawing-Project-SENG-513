@@ -158,6 +158,8 @@ io.on('connection', function(socket){
 	socket.on('chat message', function(msg){
 		msg.time = DisplayCurrentTime();
 		messages.push(msg);
+
+
 		io.emit('chat message1', msg);
 		//console.log(msg);
 	});
@@ -213,8 +215,23 @@ io.on('connection', function(socket){
     //console.log("pushed the data to clients");
   });
 
+	//when the server gets the chat message
+	socket.on('chat message', function(message){
+		//split the message by spaces
+		var list  = message.split(" ");
+		var listWord;
+
+		//for each item in this array check if it is the guessed word
+		for(var i = 0; i < list.length; i++){
+			listWord = list[i];
+			pontentialGuess(listWord);
+		}
+		//send message to be broadcast in the chat
+		io.emit('broadcastMessage', message);
+	});
+
 	//guessing for a word
-  socket.on('word guess', function(guess){
+  function pontentialGuess(guess){
 		var userGuess = guess.toLowerCase();
 		//if the guessed word is correct
     if(userGuess === currentWord){
@@ -242,7 +259,7 @@ io.on('connection', function(socket){
     else{
       console.log("you guessed wrong");
     }
-  });
+  }
 
 });
 

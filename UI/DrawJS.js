@@ -60,11 +60,163 @@ socket.on('whosDrawing', function(currentDrawingUser){
 
   //$('#outer').append('<h1 id="scoreField"> Score: 0</h1>');
 });
+
+function listenerModeClient(){
+  var canvas = new fabric.StaticCanvas("draw", {
+
+  });
+
+  //get the current time left from the server and display it
+  socket.on('send current time', function(currentTime){
+    //console.log(currentTime);
+    document.getElementById("time").innerHTML = currentTime;
+  });
+
+  socket.on('receive data', function(data){
+    //console.log(data);
+    canvas.loadFromJSON(data);
+  });
+
+  //get the cursor
+  var cursor = new fabric.StaticCanvas("cursor");
+
+  /*//send message to the server with name and color
+  $('form').submit(function(){
+    socket.emit('word guess', $('#m').val());
+    $('#m').val('');
+    return false;
+  });*/
+}
+
+  function drawingModeClient(){
+  //get the drawing word
+  socket.emit('getDrawingWord');
+
+  //variable that controls how offen we send packets to Server
+  //var breakPoint = 0;
+
+  //listen for a responce from server for the word you have to draw
+  socket.on('recvWord', function(responce){
+    word = responce;
+    document.getElementById("word").innerHTML = word;
+  });
+
+  //get the current time left from the server and display it
+  socket.on('send current time', function(currentTime){
+    //console.log(currentTime);
+    document.getElementById("time").innerHTML = currentTime;
+  });
+
+  //set the new canvas to be able to draw
+  var canvas = new fabric.Canvas("draw", {
+    isDrawingMode: true,
+    freeDrawingCursor: 'none'
+  });
+
+  //get the cursor
+  var cursor = new fabric.StaticCanvas("cursor");
+
+  //initalize the brushes width and color
+  canvas.freeDrawingBrush.width = 20;
+  canvas.freeDrawingBrush.color = '#000000';
+
+  //set cursorOpacity to 50%
+  var cursorOpacity = .5;
+  //make the mousecursor a circle with the below attributes
+  var mousecursor = new fabric.Circle({
+    left: -100,
+    top: -100,
+    radius: canvas.freeDrawingBrush.width / 2,
+    fill: "rgba(196,196,196," + cursorOpacity + ")",
+    stroke: "black",
+    originX: 'center',
+    originY: 'center'
+  });
+
+  //add the cursor to the canvas
+  cursor.add(mousecursor);
+
+  //when the mouse moves
+  canvas.on('mouse:move', function (evt) {
+    var mouse = this.getPointer(evt.e);
+    mousecursor
+      .set({
+        top: mouse.y,
+        left: mouse.x
+      })
+      .setCoords()
+      .canvas.renderAll();
+  /*
+      //determine if we need to broadcast event to server
+      if(breakPoint === 10){
+        console.log("mouse moving");
+        breakPoint = 0;
+        document.elementFromPoint(x, y).click();
+      }
+      else{
+        breakPoint++;
+      }*/
+  });
+
+  canvas.on('mouse:out', function () {
+    // put circle off screen
+    mousecursor
+      .set({
+        top: -100,//mousecursor.originalState.top,
+        left: -100 //mousecursor.originalState.left
+      })
+      .setCoords()
+      .canvas.renderAll();
+  });
+
+  canvas.on('mouse:up', function(){
+    //console.log(JSON.stringify(canvas));
+    socket.emit('push data', JSON.stringify(canvas));
+  });
+
+  //while brush size is changed
+  document.getElementById("size").oninput = function () {
+    var size = this.value;
+    mousecursor
+      .center()
+      .set({
+        radius: size/2
+      })
+      .setCoords()
+      .canvas.renderAll();
+  };
+
+  //after brush size has been changed
+  document.getElementById("size").onchange = function () {
+    var size = parseInt(this.value, 10);
+    canvas.freeDrawingBrush.width = size;
+    mousecursor
+      .set({
+        //left: mousecursor.originalState.left,
+        //top: mousecursor.originalState.top,
+        radius: size/2
+      })
+      .setCoords()
+      .canvas.renderAll();
+  };
+
+  //change drawing color
+  document.getElementById("color").onchange = function () {
+    canvas.freeDrawingBrush.color = this.value;
+    var bigint = parseInt(this.value.replace("#", ""), 16);
+    var r = (bigint >> 16) & 255;
+    var g = (bigint >> 8) & 255;
+    var b = bigint & 255;
+    //mousecursor.fill = "rgba(" + [r,g,b,cursorOpacity].join(",") + ")";
+  };
+}
+
+
 function submitGuess(){
   var guessText = document.getElementById("myGuess").value;
 
   console.log("your word is: "+ guessText);
-  socket.emit('word guess', guessText);
+  socket.emit('chat message', guessText);
 
   //erase guess field
   document.getElementById("myGuess").value = "";
@@ -84,152 +236,8 @@ socket.on('correctGuess', function(score){
 
 })
 
-function listenerModeClient(){
-var canvas = new fabric.StaticCanvas("draw", {
-
+//when given a client message broadcast it to the side
+socket.on('broadcastMessage', function(givenMessage){
+  console.log(givenMessage);
+  $('#messages').append('<li>' + givenMessage + '</li>');
 });
-
-//get the current time left from the server and display it
-socket.on('send current time', function(currentTime){
-  //console.log(currentTime);
-  document.getElementById("time").innerHTML = currentTime;
-});
-
-socket.on('receive data', function(data){
-  //console.log(data);
-  canvas.loadFromJSON(data);
-});
-
-//get the cursor
-var cursor = new fabric.StaticCanvas("cursor");
-
-/*//send message to the server with name and color
-$('form').submit(function(){
-  socket.emit('word guess', $('#m').val());
-  $('#m').val('');
-  return false;
-});*/
-}
-
-function drawingModeClient(){
-//get the drawing word
-socket.emit('getDrawingWord');
-
-//variable that controls how offen we send packets to Server
-//var breakPoint = 0;
-
-//listen for a responce from server for the word you have to draw
-socket.on('recvWord', function(responce){
-  word = responce;
-  document.getElementById("word").innerHTML = word;
-});
-
-//get the current time left from the server and display it
-socket.on('send current time', function(currentTime){
-  //console.log(currentTime);
-  document.getElementById("time").innerHTML = currentTime;
-});
-
-//set the new canvas to be able to draw
-var canvas = new fabric.Canvas("draw", {
-  isDrawingMode: true,
-  freeDrawingCursor: 'none'
-});
-
-//get the cursor
-var cursor = new fabric.StaticCanvas("cursor");
-
-//initalize the brushes width and color
-canvas.freeDrawingBrush.width = 20;
-canvas.freeDrawingBrush.color = '#000000';
-
-//set cursorOpacity to 50%
-var cursorOpacity = .5;
-//make the mousecursor a circle with the below attributes
-var mousecursor = new fabric.Circle({
-  left: -100,
-  top: -100,
-  radius: canvas.freeDrawingBrush.width / 2,
-  fill: "rgba(196,196,196," + cursorOpacity + ")",
-  stroke: "black",
-  originX: 'center',
-  originY: 'center'
-});
-
-//add the cursor to the canvas
-cursor.add(mousecursor);
-
-//when the mouse moves
-canvas.on('mouse:move', function (evt) {
-  var mouse = this.getPointer(evt.e);
-  mousecursor
-    .set({
-      top: mouse.y,
-      left: mouse.x
-    })
-    .setCoords()
-    .canvas.renderAll();
-/*
-    //determine if we need to broadcast event to server
-    if(breakPoint === 10){
-      console.log("mouse moving");
-      breakPoint = 0;
-      document.elementFromPoint(x, y).click();
-    }
-    else{
-      breakPoint++;
-    }*/
-});
-
-canvas.on('mouse:out', function () {
-  // put circle off screen
-  mousecursor
-    .set({
-      top: -100,//mousecursor.originalState.top,
-      left: -100 //mousecursor.originalState.left
-    })
-    .setCoords()
-    .canvas.renderAll();
-});
-
-canvas.on('mouse:up', function(){
-  //console.log(JSON.stringify(canvas));
-  socket.emit('push data', JSON.stringify(canvas));
-});
-
-//while brush size is changed
-document.getElementById("size").oninput = function () {
-  var size = this.value;
-  mousecursor
-    .center()
-    .set({
-      radius: size/2
-    })
-    .setCoords()
-    .canvas.renderAll();
-};
-
-//after brush size has been changed
-document.getElementById("size").onchange = function () {
-  var size = parseInt(this.value, 10);
-  canvas.freeDrawingBrush.width = size;
-  mousecursor
-    .set({
-      //left: mousecursor.originalState.left,
-      //top: mousecursor.originalState.top,
-      radius: size/2
-    })
-    .setCoords()
-    .canvas.renderAll();
-};
-
-//change drawing color
-document.getElementById("color").onchange = function () {
-  canvas.freeDrawingBrush.color = this.value;
-  var bigint = parseInt(this.value.replace("#", ""), 16);
-  var r = (bigint >> 16) & 255;
-  var g = (bigint >> 8) & 255;
-  var b = bigint & 255;
-  //mousecursor.fill = "rgba(" + [r,g,b,cursorOpacity].join(",") + ")";
-};
-}
