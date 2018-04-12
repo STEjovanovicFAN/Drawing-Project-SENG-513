@@ -14,7 +14,7 @@ var drawingWordsDictionary = ["pen", "jar","ocean","worm", "cloud", "fly", "loll
 "daisy", "pencil", "flag", "carrot", "nose", "cherry", "eyes", "rocket", "ghost", "bread", "baby", "boat", "leg", "sea turtle", "angel", "robot", "bridge", "bus", "backpack", "owl", "crayon", "chair", "snail",
 "bowl", "cookie", "feather", "egg", "clock", "swimming pool", "night", "monster", "fork", "hippo", "hair", "bench", "jacket", "candy", "coat", "boy", "tail", "basketball", "popsicle", "bumblebee", "giraffe",
 "alive", "bow", "suitcase", "elephant", "dog", "shoe", "moon", "lamp", "mouse", "bone", "curl", "truck", "island", "knee", "zebra", "corn", "man", "grapes", "dream", "bug", "mountains", "lips", "baseball",
-"key", "coin", "hook", "arm", "computer", "lizard", "bee", "slide", "mitten", "rock", "head", "Mickey Mouse", "helicopter", "earth"];
+"key", "coin", "hook", "arm", "computer", "lizard", "time", "bee", "slide", "mitten", "rock", "head", "helicopter", "earth"];
 var drawUsers = [];
 var currentWord = " ";
 var countUsers = 0;
@@ -82,6 +82,12 @@ function startNewTimer(){
           var i = drawUsers[0].user;
           io.emit('whosDrawing', i);
 
+					//server that broadcasts whos currently drawing
+					var nameOFDrawingUser = drawUsers[0].userName;
+					var userColorOfMessage = drawUsers[0].color;
+					var serverMsg = " is now drawing!";
+					io.emit('serverMessage', nameOFDrawingUser, serverMsg, userColorOfMessage);
+
 					//reset the guess tracking
 					for(var j = 0; j < drawUsers.length; j++){
 						drawUsers[j].guessedCorrectly = false;
@@ -108,7 +114,7 @@ io.on('connection', function(socket){
     "socketID" : socket.id,
 		"score" : 0,
 		"guessedCorrectly" : false,
-		"userName" : "tempUser" + countUsers,
+		"userName" : "tempUser" + countUsers, //for authentication change this
 		"color" : thisUserColor
   }
   //give socket its id and name and color
@@ -288,8 +294,15 @@ io.on('connection', function(socket){
 				drawUsers[index].guessedCorrectly = true;
 				console.log(drawUsers[index].score);
 
-				//need to change this emit statement
+				//add points to drawer if another person guessed his shit correctly
+				var addPointsToDrawer = drawUsers[0].socketID;
+				drawUsers[0].score += 10;
+				io.to(addPointsToDrawer).emit('correctGuess', drawUsers[0].score);
+
+				//need to change this emit statement JEFF
 				io.to(myid).emit('correctGuess', drawUsers[index].score);
+
+
 			}
 			//if already guessed do nothing but format the serverMSG
 			else{

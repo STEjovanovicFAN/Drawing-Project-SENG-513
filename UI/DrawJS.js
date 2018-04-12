@@ -1,9 +1,8 @@
 var socket = io();
 var word;
 var userID;
-var userName;
+var userName; //for authentication change this name 
 var userColor;
-
 
 //get this sockets id
 socket.on('pushSocketID', function(thisUserID){
@@ -246,7 +245,7 @@ socket.on('correctGuess', function(score){
   button.onclick = function(){};
 
   */
-  $('#guessbox').append('<h1>Congratulations! you guessed correctly</h1>');
+  //$('#guessbox').append('<h1>Congratulations! you guessed correctly</h1>');
 
 })
 
