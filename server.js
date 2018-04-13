@@ -163,31 +163,13 @@ io.on('connection', function(socket){
     //give the word to the drawer
     socket.emit('recvWord', item);
   });
-/*
-	io.emit('updateOnlineList', users);
-	io.emit('updateHistory', messages);
-	//console.log(sockets.includes(socket.id));
-	sockets.push(socket.id);
-	//console.log(sockets);
 
-	socket.on('chat message', function(msg){
-		msg.time = DisplayCurrentTime();
-		messages.push(msg);
-
-
-		io.emit('chat message1', msg);
-		//console.log(msg);
+	socket.on('saveCanvas', function(obj){
+		//canvas string from clients
+		console.log("obj = " + obj.token);
+		console.log("canvas = " + obj.image);
 	});
 
-	socket.on('updateUsers', function (userPref) {
-		users.push(userPref);
-		io.emit('updateOnlineList', users);
-	});
-
-	socket.on('updateOnlineList', function () {
-		io.emit('updateOnlineList', users);
-	});
-*/
 	socket.on('disconnect', function(){
 		/*users = [];
 		io.emit('getUsers');
@@ -196,33 +178,7 @@ io.on('connection', function(socket){
     var index = drawUsers.findIndex(x => x.socketID===socket.id);
     drawUsers.splice(index,1);
 	});
-/*
-	//set user
-	socket.on('setuser', function (user) {
-		userNum++;
-		user.name = genName();
-		user.color = randColor();
-		users.push(user);
-		socket.emit('setUser', user);
-	});
 
-	//add user
-	socket.on('addUser', function (user) {
-		user.color = randColor();
-		users.push(user);
-		socket.emit('setUser', user);
-	});
-
-	//UPDATE PREFS HERE
-	socket.on('updatePrefs', function (update) {
-		//console.log("GOTHERE");
-		for(i=0; i < users.length; i++){
-			if(users[i]['name'] === update.oldName)
-				users[i] = update.userPref;
-		}
-		io.emit('updateOnlineList', users);
-		//console.log(users);
-	});*/
 
 	//if server gets data broadcast it to all clients
   socket.on('push data', function(data){
@@ -331,6 +287,9 @@ io.on('connection', function(socket){
   }
 
 });
+
+
+
 
 http.listen(port, function(){
     console.log('The server is listening on: ' + port + ' port.');

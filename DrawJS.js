@@ -1,9 +1,9 @@
 var socket = io();
 var word;
 var userID;
-var userName; //for authentication change this name 
+var userName; //for authentication change this name
 var userColor;
-
+var canvas;
 //get this sockets id
 socket.on('pushSocketID', function(thisUserID){
   userID = thisUserID;
@@ -76,7 +76,7 @@ socket.on('whosDrawing', function(currentDrawingUser){
 });
 
 function listenerModeClient(){
-  var canvas = new fabric.StaticCanvas("draw", {
+  canvas = new fabric.StaticCanvas("draw", {
 
   });
 
@@ -94,6 +94,9 @@ function listenerModeClient(){
   //get the cursor
   var cursor = new fabric.StaticCanvas("cursor");
 
+
+
+
   /*//send message to the server with name and color
   $('form').submit(function(){
     socket.emit('word guess', $('#m').val());
@@ -102,6 +105,26 @@ function listenerModeClient(){
   });*/
 }
 
+function saveImg(){
+  console.log("called save image");
+  let obj = {};
+  let imageString = JSON.stringify(canvas);
+  firebase.auth().currentUser.getIdToken(true)
+    .then(function (idToken) {
+      obj.token = idToken;
+      obj.image = imageString;
+      console.log("hi there");
+      socket.emit('saveCanvas', obj);
+    })
+    .catch (function (error) {
+        let errorCode = error.code;
+        let errorMessage = error.message;
+        if (errorCode && errorMessage) {
+          console.log(errorCode);
+          console.log(errorMessage);
+        }
+    });
+}
   function drawingModeClient(){
   //get the drawing word
   socket.emit('getDrawingWord');
@@ -122,7 +145,7 @@ function listenerModeClient(){
   });
 
   //set the new canvas to be able to draw
-  var canvas = new fabric.Canvas("draw", {
+  canvas = new fabric.Canvas("draw", {
     isDrawingMode: true,
     freeDrawingCursor: 'none'
   });
@@ -224,6 +247,7 @@ function listenerModeClient(){
     //mousecursor.fill = "rgba(" + [r,g,b,cursorOpacity].join(",") + ")";
   };
 }
+
 
 function submitGuess(){
   var guessText = document.getElementById("myGuess").value;
