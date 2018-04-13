@@ -60,10 +60,7 @@ socket.on('whosDrawing', function(currentDrawingUser){
     $('#guessbox').append('<input type = "text" onkeypress="checkForEnter(event)" id = "myGuess">');
     $('#guessbox').append('<button id = "submitGuess">Send Message</button>');
     $('#guessbox').append('<script> function checkForEnter(event){ if (event.which === 13){submitGuess();}}</script>');
-    /*
-    function checkForEnter(event){
-      console.log("someone typed");
-    }*/
+
 
     var button = document.getElementById("submitGuess");
 
@@ -71,8 +68,6 @@ socket.on('whosDrawing', function(currentDrawingUser){
     listenerModeClient();
 
   }
-
-  //$('#outer').append('<h1 id="scoreField"> Score: 0</h1>');
 });
 
 function listenerModeClient(){
@@ -97,12 +92,6 @@ function listenerModeClient(){
 
 
 
-  /*//send message to the server with name and color
-  $('form').submit(function(){
-    socket.emit('word guess', $('#m').val());
-    $('#m').val('');
-    return false;
-  });*/
 }
 
 function saveImg(){
@@ -126,7 +115,7 @@ function saveImg(){
 
 function getImg(){
   let obj = {};
-  obj.index = 0;
+  obj.index = 3;
   firebase.auth().currentUser.getIdToken(true)
     .then(function (idToken) {
       obj.token = idToken;
@@ -144,8 +133,12 @@ function getImg(){
 }
 
 socket.on('retreivedImage', function(img){
-  console.log("got an image from server");
+  //FIXME
+  canvas.loadFromJSON(img);
+
 });
+
+
   function drawingModeClient(){
   //get the drawing word
   socket.emit('getDrawingWord');

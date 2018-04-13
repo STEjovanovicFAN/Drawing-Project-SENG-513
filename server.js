@@ -172,7 +172,7 @@ io.on('connection', function(socket){
                 let uid = decodedToken.uid;
                 // append image to an array of image for a user
 
-                writeImageToDB(uid, obj.image);
+                writeImageToDB(uid, obj.image, socket.id);
             }).catch(function(error) {
               console.log(error.message);
             let errorCode = error.code;
@@ -189,9 +189,8 @@ io.on('connection', function(socket){
         admin.auth().verifyIdToken(obj.token)
             .then(function(decodedToken) {
                 let uid = decodedToken.uid;
-                console.log("breakpoint 1");
-                let image = readImageFromDB(uid, obj.index);
-                console.log("sending image");
+                let image = readImageFromDB(uid, obj.index, socket.id);
+
             }).catch(function(error) {
             let errorCode = error.code;
             let errorMessage = error.message;
@@ -377,7 +376,7 @@ function writeImageToDB(uid, image) {
 }
 
 //index: Int, image: String
-function readImageFromDB(uid, index) {
+function readImageFromDB(uid, index, sid) {
     let ref = db.ref('images/' + uid);
 
     let firstQuery = ref.orderByKey();
@@ -388,7 +387,8 @@ function readImageFromDB(uid, index) {
             snapshot.forEach(function (child) {
                 if (index === i) {
                     let image = child.val().image;
-                    socket.emit('retreivedImage', image);
+                    console.log("trying to emit to " + sid);
+                    io.to(sid).emit('retreivedImage', image);
                 }
                 i++;
             });
