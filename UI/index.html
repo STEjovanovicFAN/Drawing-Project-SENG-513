@@ -16,9 +16,31 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
+  <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase.js"></script>
   </head>
   <body style="background: #587291;">
+  <!-- Modal Sign Up Window -->
+  <div class="modal fade" id="auth_modal_window" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h1 class="modal-title" id="auth_modal_window_title">Create Account</h1>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <input type="text" class="form-control" id="auth_modal_window_email_text_field" name="username" placeholder="Email Address" required="" autofocus="" />
+                  <input type="password" class="form-control" id="auth_modal_window_password_text_field" name="password" placeholder="Password" required=""/>
+                  <button class="btn btn-lg btn-primary btn-block" id="auth_modal_window_button" type="submit" onclick="auth()">Create Account</button>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" id="auth_modal_window_footer_button" onclick="switchAuthModelWindowFooterButton()">Already have an account yet? Sign in here.</button>
+              </div>
+          </div>
+      </div>
+  </div>
+  <!-- Nav Bar -->
       <nav class="navbar navbar-inverse" style="margin:0px;">
         <div class="container-fluid">
           <div class="navbar-header">
@@ -28,11 +50,8 @@
             <li class="active"><a href="#">My Account</a></li>
             <li><a href="#">My Pics</a></li>
           </ul>
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
-            <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
-          </ul>
         </div>
+          <button class="btn btn-outline-success" id="auth_button" type="button" data-toggle="modal" onclick="authButtonDidPress()">Log in</button>
       </nav>
     <div id='main'>
       <article>
@@ -68,5 +87,114 @@
     <script type="text/javascript" src="DrawJS.js"></script>
     <!--<script type="text/javascript" src="chat.js"></script>-->
 
+      <!-- Firebase SDK-->
+      <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase.js"></script>
+      <script>
+          let firstTimeWindowOpened = true;
+
+          // Initialize Firebase
+          const config = {
+              apiKey: "AIzaSyC15YosRivMEvcdkP09MHUYhQwi7VBgIWE",
+              authDomain: "drawing-project-seng-513.firebaseapp.com",
+              databaseURL: "https://drawing-project-seng-513.firebaseio.com",
+              projectId: "drawing-project-seng-513",
+              storageBucket: "drawing-project-seng-513.appspot.com",
+              messagingSenderId: "858775732575"
+          };
+          firebase.initializeApp(config);
+          firebase.auth().onAuthStateChanged(function(user) {
+              if (user) {
+                  console.log('User with ' + user.uid + ' has signed in.');
+                  $('#auth_button').text('Log Out')
+              } else {
+                  console.log('User hasn\'t signed in.');
+                  if (firstTimeWindowOpened) {
+                      $('#auth_modal_window').modal('show');
+                  }
+                  $('#auth_button').text('Log In')
+              }
+              firstTimeWindowOpened = false;
+          });
+
+          function authButtonDidPress() {
+              // Check if user is signed in
+              if (firebase.auth().currentUser) {
+                  // User is signed in
+                  logOutWithEmailAndPassword();
+              } else {
+                  // User is not signed in
+                  $('#auth_modal_window').modal('show');
+              }
+          }
+
+          function switchAuthModelWindowFooterButton() {
+              if (userCreatingAccount()) {
+                  $('#auth_modal_window_title').text('Sign In');
+                  $('#auth_modal_window_button').text('Sign In');
+                  $('#auth_modal_window_footer_button').text('Don\'t have an account yet? Sign up here.');
+              } else {
+                  $('#auth_modal_window_title').text('Create Account');
+                  $('#auth_modal_window_button').text('Sign In');
+                  $('#auth_modal_window_footer_button').text('Already have an account yet? Sign in here.');
+              }
+          }
+
+          // authenticates a user
+          function auth() {
+              const email = $('#auth_modal_window_email_text_field').val();
+              const password = $('#auth_modal_window_password_text_field').val();
+
+              if (userCreatingAccount()) {
+                  createUserWithEmailAndPassword(email, password);
+              } else {
+                  logInWithEmailAndPassword(email, password);
+              }
+          }
+
+          // creates an account in Firebase with an email and password
+          function createUserWithEmailAndPassword(email, password) {
+             firebase.auth().createUserWithEmailAndPassword(email, password)
+                 .then (function () {
+                     $('#auth_modal_window').modal('hide');
+                 })
+                 .catch (function(error) {
+                      let errorCode = error.code;
+                      let errorMessage = error.message;
+                      if (errorCode && errorMessage) {
+                          console.log(errorCode);
+                          console.log(errorMessage);
+                      }
+                  });
+          }
+
+          // signs in a user with an email and password
+          function logInWithEmailAndPassword(email, password) {
+              firebase.auth().signInWithEmailAndPassword(email, password)
+                  .then (function () {
+                      $('#auth_modal_window').modal('hide');
+                  })
+                  .catch (function(error) {
+                      let errorCode = error.code;
+                      let errorMessage = error.message;
+                      if (errorCode && errorMessage) {
+                          console.log(errorCode);
+                          console.log(errorMessage);
+                      }
+                  });
+          }
+
+          function logOutWithEmailAndPassword() {
+              firebase.auth().signOut().then(function() {
+                  console.log('User has signed out successfully.');
+              }).catch(function(error) {
+                  console.log('Error: User could not sign out.');
+              });
+          }
+
+          // check if a user currently have creating account UI
+          function userCreatingAccount() {
+              return $('#auth_modal_window_title').text() === 'Create Account';
+          }
+      </script>
   </body>
 </html>

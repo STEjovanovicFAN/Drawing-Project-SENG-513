@@ -3,6 +3,14 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var port = process.env.PORT || 3000;
 
+// Firebase Admin SDK Setup
+// const admin = require('firebase-admin');
+// const serviceAccount = require('./keys/AdminSDK.json');
+// admin.initializeApp({
+//     credential: admin.credential.cert(serviceAccount),
+//     databaseURL: 'https://drawing-project-seng-513.firebaseio.com'
+// });
+
 //drawing variables
 var drawingWordsDictionary = ["pen", "jar","ocean","worm", "cloud", "fly", "lollipop", "wheel", "apple", "triangle", "diamond", "lemon", "pig", "fire", "ring", "motorcycle", "water", "glasses", "kitten", "octopus", "eye",
 "woman", "ears", "cat", "drum", "family", "shirt", "crack", "chimney", "rabbit", "pillow", "square", "oval", "swing", "girl", "bed", "line", "skateboard", "spoon", "kite", "stairs", "cup", "bunny", "snake", "sun",
@@ -107,6 +115,9 @@ io.on('getWhosDrawing', function (){
 });
 
 io.on('connection', function(socket){
+
+    console.log("A new user has connected.");
+
 	var thisUserColor = randColor();
 	//create a new user object
   var user1 = {
@@ -322,6 +333,7 @@ io.on('connection', function(socket){
 });
 
 http.listen(port, function(){
+    console.log('The server is listening on: ' + port + ' port.');
 });
 /*
 function genName(){
