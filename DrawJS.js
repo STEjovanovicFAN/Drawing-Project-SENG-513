@@ -106,14 +106,12 @@ function listenerModeClient(){
 }
 
 function saveImg(){
-  console.log("called save image");
   let obj = {};
   let imageString = JSON.stringify(canvas);
   firebase.auth().currentUser.getIdToken(true)
     .then(function (idToken) {
       obj.token = idToken;
       obj.image = imageString;
-      console.log("hi there");
       socket.emit('saveCanvas', obj);
     })
     .catch (function (error) {
@@ -125,6 +123,29 @@ function saveImg(){
         }
     });
 }
+
+function getImg(){
+  let obj = {};
+  obj.index = 0;
+  firebase.auth().currentUser.getIdToken(true)
+    .then(function (idToken) {
+      obj.token = idToken;
+      console.log("hi there");
+      socket.emit('readCanvas', obj);
+    })
+    .catch (function (error) {
+        let errorCode = error.code;
+        let errorMessage = error.message;
+        if (errorCode && errorMessage) {
+          console.log(errorCode);
+          console.log(errorMessage);
+        }
+    });
+}
+
+socket.on('retreivedImage', function(img){
+  console.log("got an image from server");
+});
   function drawingModeClient(){
   //get the drawing word
   socket.emit('getDrawingWord');

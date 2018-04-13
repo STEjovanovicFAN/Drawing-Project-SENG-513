@@ -171,8 +171,10 @@ io.on('connection', function(socket){
             .then(function(decodedToken) {
                 let uid = decodedToken.uid;
                 // append image to an array of image for a user
-                writeImageToDB(uid, image);
+
+                writeImageToDB(uid, obj.image);
             }).catch(function(error) {
+              console.log(error.message);
             let errorCode = error.code;
             let errorMessage = error.message;
             if (errorCode && errorMessage) {
@@ -183,10 +185,13 @@ io.on('connection', function(socket){
 	});
 
 	socket.on('readCanvas', function(obj) {
+    console.log("in read canvas");
         admin.auth().verifyIdToken(obj.token)
             .then(function(decodedToken) {
                 let uid = decodedToken.uid;
+                console.log("breakpoint 1");
                 let image = readImageFromDB(uid, obj.index);
+                console.log("sending image");
                 socket.emit('retreivedImage', image);
             }).catch(function(error) {
             let errorCode = error.code;
@@ -358,26 +363,33 @@ function DisplayCurrentTime() {
 // appends an image to the image
 // image: String
 function writeImageToDB(uid, image) {
+  console.log("in writeImageToDB");
     let ref = db.ref('images/' + uid).push();
-    ref.set(image)
-        .catch (function(error) {
-            let errorCode = error.code;
-            let errorMessage = error.message;
-            if (errorCode && errorMessage) {
+
+
+
+     ref.set({image: image})
+         .catch (function(error) {
+             let errorCode = error.code;
+             let errorMessage = error.message;
+             if (errorCode && errorMessage) {
                 console.log(errorCode);
                 console.log(errorMessage);
-            }
-        });
+             }
+         });
 }
 
 // index: Int, image: String
 function readImageFromDB(uid, index) {
+  console.log("in readfromdb");
     let ref = db.ref('images/' + uid);
     let image = null;
+
     let firstQuery = ref.orderByKey().startAt(index).limitToFirst(1);
-    firstQuery.once('value', function(snapshot) {
+
+        console.log("break1");
+        firstQuery.once('value', function(snapshot) {
         image = snapshot.key();
     });
-
     return image;
 }
