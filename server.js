@@ -4,12 +4,14 @@ var io = require('socket.io')(http);
 var port = process.env.PORT || 3000;
 
 // Firebase Admin SDK Setup
-// const admin = require('firebase-admin');
-// const serviceAccount = require('./keys/AdminSDK.json');
-// admin.initializeApp({
-//     credential: admin.credential.cert(serviceAccount),
-//     databaseURL: 'https://drawing-project-seng-513.firebaseio.com'
-// });
+const admin = require('firebase-admin');
+const serviceAccount = require('./keys/firebase-key.json');
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: 'https://drawing-project-seng-513.firebaseio.com'
+});
+// reference to the Firebase Database
+const db = admin.database();
 
 //drawing variables
 var drawingWordsDictionary = ["pen", "jar","ocean","worm", "cloud", "fly", "lollipop", "wheel", "apple", "triangle", "diamond", "lemon", "pig", "fire", "ring", "motorcycle", "water", "glasses", "kitten", "octopus", "eye",
@@ -165,9 +167,19 @@ io.on('connection', function(socket){
   });
 
 	socket.on('saveCanvas', function(obj){
-		//canvas string from clients
-		console.log("obj = " + obj.token);
-		console.log("canvas = " + obj.image);
+        admin.auth().verifyIdToken(obj.token)
+            .then(function(decodedToken) {
+                let uid = decodedToken.uid;
+                // append image to an array of image for a user
+                writeImageToDB(uid, image);
+            }).catch(function(error) {
+            let errorCode = error.code;
+            let errorMessage = error.message;
+            if (errorCode && errorMessage) {
+                console.log(errorCode);
+                console.log(errorMessage);
+            }
+            });
 	});
 
 	socket.on('disconnect', function(){
@@ -318,4 +330,31 @@ function DisplayCurrentTime() {
 	//var seconds = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
 	returnTime = "[" + hours + ":" + minutes + "] "; //":"// + seconds;
 	return returnTime;
+}
+
+// Firebase Databse
+
+// obj {
+//     token: String
+//     image: String
+// }
+
+// appends an image to the image
+// image: String
+function writeImageToDB(uid, image) {
+    let ref = db.ref('users/' + uid).push();
+    ref.set(image)
+        .catch (function(error) {
+            let errorCode = error.code;
+            let errorMessage = error.message;
+            if (errorCode && errorMessage) {
+                console.log(errorCode);
+                console.log(errorMessage);
+            }
+        });
+}
+
+// index: Int, image: String
+function readImageFromDB(uid, index) {
+    let ref = db.ref(uid);
 }
