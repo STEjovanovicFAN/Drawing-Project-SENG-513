@@ -192,7 +192,6 @@ io.on('connection', function(socket){
                 console.log("breakpoint 1");
                 let image = readImageFromDB(uid, obj.index);
                 console.log("sending image");
-                socket.emit('retreivedImage', image);
             }).catch(function(error) {
             let errorCode = error.code;
             let errorMessage = error.message;
@@ -364,32 +363,34 @@ function DisplayCurrentTime() {
 // image: String
 function writeImageToDB(uid, image) {
   console.log("in writeImageToDB");
-    let ref = db.ref('images/' + uid).push();
+  let ref = db.ref('images/' + uid).push();
 
-
-
-     ref.set({image: image})
-         .catch (function(error) {
-             let errorCode = error.code;
-             let errorMessage = error.message;
-             if (errorCode && errorMessage) {
-                console.log(errorCode);
-                console.log(errorMessage);
-             }
-         });
+  ref.set({image: image})
+      .catch (function(error) {
+          let errorCode = error.code;
+          let errorMessage = error.message;
+          if (errorCode && errorMessage) {
+              console.log(errorCode);
+              console.log(errorMessage);
+          }
+      });
 }
 
-// index: Int, image: String
+//index: Int, image: String
 function readImageFromDB(uid, index) {
-  console.log("in readfromdb");
     let ref = db.ref('images/' + uid);
-    let image = null;
 
-    let firstQuery = ref.orderByKey().startAt(index).limitToFirst(1);
+    let firstQuery = ref.orderByKey();
 
-        console.log("break1");
-        firstQuery.once('value', function(snapshot) {
-        image = snapshot.key();
-    });
-    return image;
+    return firstQuery.once('value')
+        .then (function(snapshot) {
+            let i = 0;
+            snapshot.forEach(function (child) {
+                if (index === i) {
+                    let image = child.val().image;
+                    socket.emit('retreivedImage', image);
+                }
+                i++;
+            });
+        });
 }
