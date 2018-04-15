@@ -1,20 +1,29 @@
-var app = require('express')();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
-var port = process.env.PORT || 3000;
-
-// Firebase Admin SDK Setup
+/* Dependencies */
+const express = require('express');
+const app = express();
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
+const port = process.env.PORT || 3000;
 const admin = require('firebase-admin');
 const serviceAccount = require('./keys/firebase-key.json');
+
+// Firebase Admin SDK Setup
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     databaseURL: 'https://drawing-project-seng-513.firebaseio.com'
 });
+
+http.listen(port, function() {
+    console.log('The server is listening on: ' + port + ' port.');
+});
+
+/* Variables */
+
 // reference to the Firebase Database
 const db = admin.database();
 
 //drawing variables
-var drawingWordsDictionary = ["pen", "jar","ocean","worm", "cloud", "fly", "lollipop", "wheel", "apple", "triangle", "diamond", "lemon", "pig", "fire", "ring", "motorcycle", "water", "glasses", "kitten", "octopus", "eye",
+let drawingWordsDictionary = ["pen", "jar","ocean","worm", "cloud", "fly", "lollipop", "wheel", "apple", "triangle", "diamond", "lemon", "pig", "fire", "ring", "motorcycle", "water", "glasses", "kitten", "octopus", "eye",
 "woman", "ears", "cat", "drum", "family", "shirt", "crack", "chimney", "rabbit", "pillow", "square", "oval", "swing", "girl", "bed", "line", "skateboard", "spoon", "kite", "stairs", "cup", "bunny", "snake", "sun",
 "spider web", "flower", "milk", "blanket", "jellyfish", "snowman", "candle", "love", "doll", "king", "bear", "dragon", "frog", "bat", "banana", "box", "face", "table", "music", "bird", "book", "whale", "legs",
 "orange", "spider", "sunglasses", "button", "blocks", "cupcake", "cow", "lion", "person", "jail", "beak", "butterfly", "ice cream cone", "purse", "ladybug", "bark", "bike", "ant", "house", "bunk bed", "turtle",
@@ -25,153 +34,126 @@ var drawingWordsDictionary = ["pen", "jar","ocean","worm", "cloud", "fly", "loll
 "bowl", "cookie", "feather", "egg", "clock", "swimming pool", "night", "monster", "fork", "hippo", "hair", "bench", "jacket", "candy", "coat", "boy", "tail", "basketball", "popsicle", "bumblebee", "giraffe",
 "alive", "bow", "suitcase", "elephant", "dog", "shoe", "moon", "lamp", "mouse", "bone", "curl", "truck", "island", "knee", "zebra", "corn", "man", "grapes", "dream", "bug", "mountains", "lips", "baseball",
 "key", "coin", "hook", "arm", "computer", "lizard", "time", "bee", "slide", "mitten", "rock", "head", "helicopter", "earth"];
-var drawUsers = [];
-var scoreBoardUsers = [];
-var currentWord = " ";
-var countUsers = 0;
-var time = 0;
-var totalClients = 0;
-var currentDrawingID = " ";
-var firstGuess = false;
+let drawUsers = [];
+let scoreBoardUsers = [];
+let currentWord = " ";
+let countUsers = 0;
+let time = 0;
+let totalClients = 0;
+let currentDrawingID = " ";
+let firstGuess = false;
 
-/*
-//chat variables
-let users = new Array();
-let messages = new Array();
-let userNum = 0;
-let sockets = new Array();
-*/
+/* Routing */
 
-//give client html Page on load
+app.use(express.static(__dirname + '/public'));
+
 app.get('/', function(req, res){
 	res.sendFile(__dirname + '/index.html');
 });
 
-//give client the css page if client asks for it
-app.get('/style.css', function(req, res){
-    res.sendFile(__dirname + '/style.css');
-});
-
-//give client the chat only if the client asks for it
-app.get('/chat.js', function(req, res){
-    res.sendFile(__dirname + '/chat.js');
-});
-
-//give client the chat only if the client asks for it
-app.get('/DrawJS.js', function(req, res){
-    res.sendFile(__dirname + '/DrawJS.js');
-});
-
 //create a timer for 60 seconds, update clients every second (1000ms)
-function startNewTimer(){
-		//console.log("i reset the timer");
+function startNewTimer() {
+    //console.log("i reset the timer");
     time = 15;
     //while timer is running, send the current time for this round
-    var timer = setInterval(function(){
-      if(time >= 0){
-        io.emit('send current time', time);
-        //console.log(time);
-        time --;
-      }
-      //if the time is < 0, stop the timer and handoff the drawing page to another player
-      else{
-        clearTimeout(timer);
-        //if there are no users connected
-        if(drawUsers.length === 0){
-          //do nothing
+    let timer = setInterval(function() {
+        if (time >= 0) {
+            io.emit('send current time', time);
+            time--;
+        } else {
+            // if the time is < 0, stop the timer and handoff the drawing page to another player
+            clearTimeout(timer);
+            // if there are no users connected
+            if (drawUsers.length === 0) {
+                // do nothing
+            } else {
+                // otherwise continue with program
+                // boradcast to all the rest of the sockets what they are now
+                let i = drawUsers[0];
+                drawUsers.splice(0, 1);
+                drawUsers.push(i);
+                //store current drawing user
+                currentDrawingID = drawUsers[0].user;
+
+                // emit who the current drawing user is
+                let index = drawUsers[0].user;
+                io.emit('whosDrawing', index);
+
+                //server that broadcasts whos currently drawing
+                let nameOfDrawingUser = drawUsers[0].userName;
+                let userColorOfMessage = drawUsers[0].color;
+                let serverMsg = " is now drawing!";
+                io.emit('serverMessage', nameOfDrawingUser, serverMsg, userColorOfMessage);
+
+                //reset the guess tracking
+                for (let j = 0; j < drawUsers.length; j++) {
+                    drawUsers[j].guessedCorrectly = false;
+                }
+                firstGuess = false;
+            }
+            startNewTimer();
         }
-        //otherwise continue with program
-        else{
-          //boradcast to all the rest of the sockets what they are now
-          var i = drawUsers[0];
-          drawUsers.splice(0, 1);
-          drawUsers.push(i);
-          //store current drawing user
-          currentDrawingID = drawUsers[0].user;
-
-          //emit who the current drawing user is
-          var i = drawUsers[0].user;
-          io.emit('whosDrawing', i);
-
-					//server that broadcasts whos currently drawing
-					var nameOFDrawingUser = drawUsers[0].userName;
-					var userColorOfMessage = drawUsers[0].color;
-					var serverMsg = " is now drawing!";
-					io.emit('serverMessage', nameOFDrawingUser, serverMsg, userColorOfMessage);
-
-					//reset the guess tracking
-					for(var j = 0; j < drawUsers.length; j++){
-						drawUsers[j].guessedCorrectly = false;
-						//console.log(drawUsers[j].guessedCorrectly);
-					}
-					firstGuess = false;
-
-        }
-        startNewTimer();
-      }
     }, 1000);
 }
 
-//send id of whos drawing
-io.on('getWhosDrawing', function (){
-  socket.emit('whosDrawing', currentDrawingUser);
+/* Socket */
+
+// send id of whos drawing
+io.on('getWhosDrawing', function () {
+    socket.emit('whosDrawing', currentDrawingUser);
 });
 
-io.on('connection', function(socket){
-
+io.on('connection', function(socket) {
     console.log("A new user has connected.");
 
-	var thisUserColor = randColor();
+    let thisUserColor = randColor();
 	//create a new user object
-  var user1 = {
-    "user" : countUsers,
-    "socketID" : socket.id,
-		"score" : 0,
-		"guessedCorrectly" : false,
-		"userName" : "tempUser" + countUsers, //for authentication change this
-		"color" : thisUserColor
-  }
+    let user1 = {
+        "user": countUsers,
+        "socketID": socket.id,
+		"score": 0,
+		"guessedCorrectly": false,
+		"userName": "tempUser" + countUsers, //for authentication change this
+		"color": thisUserColor
+    };
 
-  //give socket its id and name and color
-  socket.emit('pushSocketID', countUsers);
+    //give socket its id and name and color
+    socket.emit('pushSocketID', countUsers);
 	socket.emit('pushSocketName', "tempUser" + countUsers);
 	socket.emit('thisUserColor', thisUserColor);
 
-  //if socket is the first one start timer, give it drawing page
-  if(countUsers === 0){
-    currentDrawingID = countUsers;
-    socket.emit('whosDrawing', currentDrawingID);
-    startNewTimer();
-  }
-  //otherwise give the socket whos currently drawing
-  else{
-    socket.emit('whosDrawing', currentDrawingID);
-  }
-
-	console.log(countUsers);
-  //update users and push this new user into our drawing queue
-  countUsers++;
-  drawUsers.push(user1);
-  //put user into our score board too and update clients about the score board
-  scoreBoardUsers.push(user1);
-  io.emit('updateScoreBoard', scoreBoardUsers);
-
-	socket.on('getDrawingWord', function(){
-    //choose a random word
-    var item = drawingWordsDictionary[Math.floor(Math.random()*drawingWordsDictionary.length)];
-    currentWord = item.toLowerCase();
-
-    //delete the random word from the dictionary
-    var index = drawingWordsDictionary.indexOf(item);
-    if(index > -1){
-      drawingWordsDictionary.splice(index, 1);
+	//if socket is the first one start timer, give it drawing page
+    if (countUsers === 0) {
+        currentDrawingID = countUsers;
+        socket.emit('whosDrawing', currentDrawingID);
+        startNewTimer();
+    } else {
+        // otherwise give the socket whos currently drawinelse
+        socket.emit('whosDrawing', currentDrawingID);
     }
 
-    //give the word to the drawer
-    socket.emit('recvWord', item);
-  });
+    console.log(countUsers);
+    // update users and push this new user into our drawing queue
+    countUsers++;
+    drawUsers.push(user1);
+    // put user into our score board too and update clients about the score board
+    scoreBoardUsers.push(user1);
+    io.emit('updateScoreBoard', scoreBoardUsers);
+    socket.on('getDrawingWord', function() {
+        // choose a random word
+        let item = drawingWordsDictionary[Math.floor(Math.random()*drawingWordsDictionary.length)];
+        currentWord = item.toLowerCase();
+        // delete the random word from the dictionary
+        let index = drawingWordsDictionary.indexOf(item);
 
-	socket.on('saveCanvas', function(obj){
+        if (index > -1) {
+            drawingWordsDictionary.splice(index, 1);
+        }
+        // give the word to the drawer
+        socket.emit('recvWord', item);
+    });
+
+    socket.on('saveCanvas', function(obj) {
         admin.auth().verifyIdToken(obj.token)
             .then(function(decodedToken) {
                 let uid = decodedToken.uid;
@@ -206,213 +188,184 @@ io.on('connection', function(socket){
         });
     });
 
-    //if a user asks to be disconnected from the game, disconnect them from the game
-    socket.on('removeMeFromGameState', function(){
-      //find the index where it is in queue
-      var index = drawUsers.findIndex(x => x.socketID===socket.id);
-      var storeQue = drawUsers[index];
-      //take it out of queue
-      drawUsers.splice(index,1);
+    // if a user asks to be disconnected from the game, disconnect them from the game
+    socket.on('removeMeFromGameState', function() {
+        // find the index where it is in queue
+        let index = drawUsers.findIndex(x => x.socketID===socket.id);
+        let storeQue = drawUsers[index];
+        // take it out of queue
+        drawUsers.splice(index, 1);
 
-      //find the index of this user in the scoreboard
-      index = scoreBoardUsers.findIndex(x => x.socketID===socket.id);
-      var storeScore = scoreBoardUsers[index];
-      //take it out of the scoreboard
-      scoreBoardUsers.splice(index,1);
-
-      //update the scoreboard
-      io.emit('updateScoreBoard', scoreBoardUsers);
-
-      //now confirm this with the client that asked to be removed from the game
-      socket.emit('confirmRemove', storeQue, storeScore);
+        // find the index of this user in the scoreboard
+        index = scoreBoardUsers.findIndex(x => x.socketID===socket.id);
+        let storeScore = scoreBoardUsers[index];
+        // take it out of the scoreboard
+        scoreBoardUsers.splice(index,1);
+        //u pdate the scoreboard
+        io.emit('updateScoreBoard', scoreBoardUsers);
+        // now confirm this with the client that asked to be removed from the game
+        socket.emit('confirmRemove', storeQue, storeScore);
     });
 
-    //when the client asks to reconnect back to game add him to the queue and scoreboard
-    socket.on('reconnectToGame', function(queueInfo, scoreInfo){
-      drawUsers.push(queueInfo);
-      scoreBoardUsers.push(scoreInfo);
-      io.emit('updateScoreBoard', scoreBoardUsers);
+    // when the client asks to reconnect back to game add him to the queue and scoreboard
+    socket.on('reconnectToGame', function(queueInfo, scoreInfo) {
+        drawUsers.push(queueInfo);
+        scoreBoardUsers.push(scoreInfo);
+        io.emit('updateScoreBoard', scoreBoardUsers);
     });
 
-	socket.on('disconnect', function(){
-		/*users = [];
-		io.emit('getUsers');
-*/
-    //get the index and take this user out of the queue
-    var index = drawUsers.findIndex(x => x.socketID===socket.id);
-    drawUsers.splice(index,1);
+	socket.on('disconnect', function() {
+        // get the index and take this user out of the queue
+        let index = drawUsers.findIndex(x => x.socketID === socket.id);
+        drawUsers.splice(index, 1);
 
-    //get the index and take the user out of the scoreboard
-    index = scoreBoardUsers.findIndex( x => x.socketID ===socket.id);
-    scoreBoardUsers.splice(index,1);
-    //update scoreboard
-    io.emit('updateScoreBoard', scoreBoardUsers);
-
+        // get the index and take the user out of the scoreboard
+        index = scoreBoardUsers.findIndex( x => x.socketID === socket.id);
+        scoreBoardUsers.splice(index,1);
+        // update scoreboard
+        io.emit('updateScoreBoard', scoreBoardUsers);
 	});
 
+	// if server gets data broadcast it to all clients
+    socket.on('push data', function(data) {
+        io.emit('receive data', data);
+    });
 
-	//if server gets data broadcast it to all clients
-  socket.on('push data', function(data){
-    io.emit('receive data', data);
-    //console.log("pushed the data to clients");
-  });
+    //when the server gets the chat message
+    socket.on('chat message', function(message, msgUser, msgColor){
+        // split the message by spaces
+        let list  = message.split(" ");
+        let listWord;
+        let getSeversMSG = " ";
 
-	//when the server gets the chat message
-	socket.on('chat message', function(message, msgUser, msgColor){
-		//split the message by spaces
-		var list  = message.split(" ");
-		var listWord;
-
-		var getSeversMSG = " ";
-		//for each item in this array check if it is the guessed word
-		for(var i = 0; i < list.length; i++){
+        // for each item in this array check if it is the guessed word
+		for (let i = 0; i < list.length; i++) {
 			listWord = list[i];
-			var checkVar = pontentialGuess(listWord);
-			//check if it returns an empty string, if not that is the message you need to broadcast
-			if(checkVar !== " "){
+            let checkVar = pontentialGuess(listWord);
+			// check if it returns an empty string, if not that is the message you need to broadcast
+			if (checkVar !== " ") {
 				getSeversMSG = checkVar;
 			}
 
-			//if the listword is correct guessed word censor it
-			var wordInLowerCase = listWord.toLowerCase();
-			if(wordInLowerCase === currentWord){
+			// if the listword is correct guessed word censor it
+            let wordInLowerCase = listWord.toLowerCase();
+			if (wordInLowerCase === currentWord) {
 				//create the length and text of the censored word
-				var censorWord ="";
-				for(var z = 0; z < currentWord.length; z++){
+                let censorWord ="";
+				for(let z = 0; z < currentWord.length; z++){
 					censorWord = censorWord + "*";
 				}
 				list[i] = censorWord;
 			}
 		}
 
-		//console.log(list);
-		//get the current time
-		var currTime = DisplayCurrentTime();
-		//make the list back into a string
-		var joinedString = list.join(" ");
+		// get the current time
+        let currTime = DisplayCurrentTime();
+		// make the list back into a string
+        let joinedString = list.join(" ");
 
-		//send message to be broadcast in the chat
+		// send message to be broadcast in the chat
 		io.emit('broadcastMessage', joinedString, msgUser, msgColor, currTime);
 
-		//broadcast the server message stating that this user guessed correctly
-		if(getSeversMSG !== " "){
+		// broadcast the server message stating that this user guessed correctly
+		if(getSeversMSG !== " ") {
 			io.emit('serverMessage',msgUser, getSeversMSG, msgColor);
 		}
 	});
 
-	//guessing for a word
-  function pontentialGuess(guess){
-		var userGuess = guess.toLowerCase();
-		//if the guessed word is correct
-		var serverMSG;
-    if(userGuess === currentWord){
-      //console.log("you guessed correctly");
-			var myid = socket.id;
-      //index for queue
-			var index = drawUsers.findIndex(x => x.socketID===socket.id);
-      //index for the scoreboard
-      var index1 = scoreBoardUsers.findIndex(x => x.socketID===socket.id);
+    // guessing for a word
+    function pontentialGuess(guess) {
+        let userGuess = guess.toLowerCase();
+		// if the guessed word is correct
+        let serverMSG;
 
-			//console.log(drawUsers[index].guessedCorrectly);
-			if(drawUsers[index].guessedCorrectly === false){
-				//console.log("user guessed correctly");
-				if(firstGuess == false){
-					//console.log("user hasn't guessed before, update score");
+		if (userGuess === currentWord) {
+            let myid = socket.id;
+			// index for queue
+            let index = drawUsers.findIndex(x => x.socketID === socket.id);
+			// index for the scoreboard
+            let index1 = scoreBoardUsers.findIndex(x => x.socketID === socket.id);
+
+			// console.log(drawUsers[index].guessedCorrectly);
+			if (drawUsers[index].guessedCorrectly === false) {
+			    //console.log("user guessed correctly");
+                if (firstGuess == false) {
+                    // console.log("user hasn't guessed before, update score");
 					drawUsers[index].score += 20;
-          //scoreBoardUsers[index1].score += 20; //here
+					// scoreBoardUsers[index1].score += 20; //here
 					firstGuess = true;
 
-					//format the server text message
-					var getUserName = drawUsers[index].userName;
+					// format the server text message
+                    let getUserName = drawUsers[index].userName;
 					serverMSG = " guessed the word correctly! 20 points awarded for being the first to guess the word!";
-
-				}
-				else{
-					drawUsers[index].score += 10;
-          //scoreBoardUsers[index1].score += 10; //here
-					var getUserName = drawUsers[index].userName;
+				} else {
+                    drawUsers[index].score += 10;
+                    let getUserName = drawUsers[index].userName;
 					serverMSG = " guessed the word correctly!";
-
 				}
 				drawUsers[index].guessedCorrectly = true;
-				//console.log(drawUsers[index].score);
 
-				//add points to drawer if another person guessed his shit correctly
-				var addPointsToDrawer = drawUsers[0].socketID;
+				// add points to drawer if another person guessed his shit correctly
+                let addPointsToDrawer = drawUsers[0].socketID;
 				drawUsers[0].score += 10;
 
-        //update for the scoreboard
-        //find the current drawing id
-        for(var k = 0 ; k < scoreBoardUsers.length; k++){
-          //check if its the current drawing user
-          if(scoreBoardUsers[k].id === currentDrawingID){
-            scoreBoardUsers[k].score += 10;
-          }
-        }
+				// update for the scoreboard
 
-				io.to(addPointsToDrawer).emit('correctGuess', drawUsers[0].score);
+                // find the current drawing id
+                for (let k = 0 ; k < scoreBoardUsers.length; k++){
+                    //check if its the current drawing user
+                    if(scoreBoardUsers[k].id === currentDrawingID) {
+                        scoreBoardUsers[k].score += 10;
+                    }
+                }
 
-				//need to change this emit statement JEFF
+                io.to(addPointsToDrawer).emit('correctGuess', drawUsers[0].score);
+
+                // need to change this emit statement JEFF
 				io.to(myid).emit('correctGuess', drawUsers[index].score);
-        //broadcast the user score list
-        io.emit('updateScoreBoard', scoreBoardUsers);
-
+				// broadcast the user score list
+                io.emit('updateScoreBoard', scoreBoardUsers);
+			} else {
+                // if already guessed do nothing but format the serverMSG
+                serverMSG = " ";
 			}
-			//if already guessed do nothing but format the serverMSG
-			else{
-  			serverMSG = " ";
-			}
-
-    }
-    else{
-      //console.log("you guessed wrong");
+		} else {
 			serverMSG = " ";
-    }
+		}
 
-		//return message from sever
+		// return message from sever
 		return serverMSG;
-  }
-
+    }
 });
 
-http.listen(port, function(){
-    console.log('The server is listening on: ' + port + ' port.');
-});
-/*
-function genName(){
-
-	let username = "user" + userNum;
-
-	return username;
-}*/
-
+// generates a random color.
 function randColor() {
-	var letters = '0123456789ABCDEF';
-	var color = '#';
-	for (var i = 0; i < 6; i++) {
-	color += letters[Math.floor(Math.random() * 16)];
+	let letters = '0123456789ABCDEF';
+    let color = '#';
+	for (let i = 0; i < 6; i++) {
+	    color += letters[Math.floor(Math.random() * 16)];
 	}
 	return color;
 }
-//function that grabs the current time and formats it
+
+// grabs the current time and formats it.
 function DisplayCurrentTime() {
-	var date = new Date();
-	var hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
-	var minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
-	//var seconds = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
-	returnTime = "[" + hours + ":" + minutes + "] "; //":"// + seconds;
-	return returnTime;
+	let date = new Date();
+    let hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+    let minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+	return "[" + hours + ":" + minutes + "] "; //":"// + seconds;
 }
 
-// Firebase Databse
+/*
+Firebase Database
+ */
 
-// obj {
-//     token: String
-//     image: String
-// }
+/*
+Writes an image to the database
 
-// appends an image to the image
-// image: String
+uid - Firebase unique id,
+image - serialized image.
+ */
 function writeImageToDB(uid, image) {
   console.log("in writeImageToDB");
   let ref = db.ref('images/' + uid).push();
@@ -428,7 +381,13 @@ function writeImageToDB(uid, image) {
       });
 }
 
-//index: Int, image: String
+/*
+Sends a serialized image to a socket.
+
+uid - Firebase unique id,
+index - Index of a requested image,
+sid - Socket id.
+ */
 function readImageFromDB(uid, index, sid) {
     let ref = db.ref('images/' + uid);
 
