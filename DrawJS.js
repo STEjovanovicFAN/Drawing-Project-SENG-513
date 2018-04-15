@@ -49,6 +49,10 @@ socket.on('whosDrawing', function(currentDrawingUser){
     $('#outer').append('<div id="cont"> <canvas id="draw" width="500" height="500"></canvas> <canvas id="cursor" width="500" height="500"></canvas></div>');
 
     $('#guessbox').empty();
+    $('#guessbox').append('<input disabled placeholder="Chat disabled for drawer." type="text" onkeypress="checkForEnter(event)" id = "myGuess">');
+    
+    $('#guessbox').append('<button  disabled id="submitGuess" class="btn-group-square">Send</button>');
+    $('#guessbox').append('<script> function checkForEnter(event){ if (event.which === 13){submitGuess();}}</script>');
     drawingModeClient();
 
   }
@@ -64,7 +68,7 @@ socket.on('whosDrawing', function(currentDrawingUser){
 
       $('#guessbox').empty();
       $('#guessbox').append('<input type = "text" onkeypress="checkForEnter(event)" id = "myGuess">');
-      $('#guessbox').append('<button id = "submitGuess">Send Message</button>');
+      $('#guessbox').append('<button id = "submitGuess">Send</button>');
       $('#guessbox').append('<script> function checkForEnter(event){ if (event.which === 13){submitGuess();}}</script>');
 
 
@@ -321,9 +325,11 @@ socket.on('broadcastMessage', function(givenMessage, msgUser, msgColor, timeGive
   console.log("test");
 
   $('#messages').append('<li>' + '<font color =' + msgColor + '>' + timeGiven + msgUser + ": "+ '</font>' +  givenMessage + '</li>');
+  $('#messages').scrollTop($('#messages')[0].scrollHeight);
 });
 
 //listen for server messages and print them on the chat
 socket.on('serverMessage', function(userCorctGuess, serverMsg, usersMsgColor){
   $('#messages').append('<li>' + '<i>' + '<font color =' + usersMsgColor + '>' + userCorctGuess +'</font>' +  serverMsg + '</i>' + '</li>');
+  $('#messages').scrollTop($('#messages')[0].scrollHeight);
 });
