@@ -1,218 +1,213 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>Drawing Page</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- add jquery-->
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <!-- JS Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/2.2.2/fabric.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-
-    <!-- add bootstrap-->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase.js"></script>
-      <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase.js"></script>
-  </head>
-  <body style="background: #587291;">
-  <!-- Modal Sign Up Window -->
-  <div class="modal fade" id="auth_modal_window" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content">
-              <div class="modal-header">
-                  <h1 class="modal-title" id="auth_modal_window_title">Create Account</h1>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">x</span>
-                  </button>
-              </div>
-              <div class="modal-body">
-                  <input type="text" class="form-control" id="auth_modal_window_email_text_field" name="username" placeholder="Email Address" required="" autofocus="" />
-                  <input type="password" class="form-control" id="auth_modal_window_password_text_field" name="password" placeholder="Password" required=""/>
-                  <button class="btn btn-lg btn-primary btn-block" id="auth_modal_window_button" type="submit" onclick="auth()">Create Account</button>
-              </div>
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" id="auth_modal_window_footer_button" onclick="switchAuthModelWindowFooterButton()">Already have an account yet? Sign in here.</button>
-              </div>
-          </div>
-      </div>
-  </div>
-  <!-- Nav Bar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <a class="navbar-brand" href="#">Draw Something</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
-              <li class="nav-item active">
-                  <a class="nav-link" href="#">Game<span class="sr-only">(current)</span></a>
-              </li>
-              <li class="nav-item">
-                  <a class="nav-link" href="#">My Account</a>
-              </li>
-              <li class="nav-item my-2 my-lg-0">
-                  <a class="nav-link" href="#" onclick="renderSavedPictures()">Saved Pictures</a>
-              </li>
-          </ul>
-          <button class="btn btn-light my-2 my-sm-0" type="submit" data-toggle="modal" onclick="authButtonDidPress()">Log In</button>
-      </div>
-  </nav>
-    <div id='main'>
-      <article>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase.js"></script>
+</head>
+<body style="background: #587291;">
+<!-- Auth Window -->
+<div class="modal fade" id="auth_modal_window" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title" id="auth_modal_window_title">Create Account</h1>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">x</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="form-control" id="auth_modal_window_email_text_field" name="username" placeholder="Email Address" required="" autofocus="" />
+                <input type="password" class="form-control" id="auth_modal_window_password_text_field" name="password" placeholder="Password" required=""/>
+                <button class="btn btn-lg btn-primary btn-block" id="auth_modal_window_button" type="submit" onclick="auth()">Create Account</button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="auth_modal_window_footer_button" onclick="switchAuthModelWindowFooterButton()">Already have an account yet? Sign in here.</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Nav Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">Draw Something</a>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Game<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">My Account</a>
+            </li>
+            <li class="nav-item my-2 my-lg-0">
+                <a class="nav-link" href="#" onclick="renderSavedPictures()">Saved Pictures</a>
+            </li>
+        </ul>
+        <button class="btn btn-light my-2 my-sm-0" id="auth_button" type="submit" data-toggle="modal" onclick="authButtonDidPress()">Log In</button>
+    </div>
+</nav>
+<!-- Main -->
+<div id="main">
+    <article>
         <!--this outer div is where the drawing/listening mode happens-->
         <div id = "outer">
-
         </div>
-      </article>
-      <aside>
+    </article>
+    <aside>
         <div id="container">
-          <div id="chat">
-            <h2 id="user">Your Username: <span id=usersName></span></h2>
-            <ul id="messages"></ul>
-            <div id="guessbox">
+            <div id="chat">
+                <h2 id="user">Your Username: <span id=usersName></span></h2>
+                <ul id="messages">
+                </ul>
+                <div id="guessbox">
+                </div>
             </div>
-          </div>
-          <div id="status">
-            <ul id="users"></ul>
-          </div>
+            <div id="status">
+            <ul id="users">
+            </ul>
+            </div>
         </div>
         <form>
-          <!--<input id="m" autocomplete="off" /><button>Send</button>-->
-
+            <!--<input id="m" autocomplete="off" /><button>Send</button>-->
         </form>
-      </aside>
-    </div>
-    <footer>
-      <!-- save image button, move as required-->
-        <button id = "savepic" onclick="saveImg()">Save Image</button>
-        <!--retrieve image button - MOVE THIS TO OTHER PAGE-->
-          <button id = "getpic" onclick="getImg()">Retrieve Image</button>
-        <h1 id="scoreField"> Score: 0</h1>
-    </footer>
+    </aside>
+</div>
+<!-- Footer -->
+<footer>
+    <!-- save image button, move as required-->
+    <button id = "savepic" onclick="saveImg()">Save Image</button>
+    <!--retrieve image button - MOVE THIS TO OTHER PAGE-->
+    <button id = "getpic" onclick="getImg()">Retrieve Image</button>
+    <h1 id="scoreField"> Score: 0</h1>
+</footer>
+<!-- JS -->
+<!--run the drawing functionality after everything is loaded-->
+<script type="text/javascript" src="DrawJS.js"></script>
+<!--<script type="text/javascript" src="chat.js"></script>-->
+<!-- Firebase SDK-->
+<script>
+    let firstTimeWindowOpened = true;
+    // Initialize Firebase
+    const config = {
+        apiKey: "AIzaSyC15YosRivMEvcdkP09MHUYhQwi7VBgIWE",
+        authDomain: "drawing-project-seng-513.firebaseapp.com",
+        databaseURL: "https://drawing-project-seng-513.firebaseio.com",
+        projectId: "drawing-project-seng-513",
+        storageBucket: "drawing-project-seng-513.appspot.com",
+        messagingSenderId: "858775732575"
+    };
+    firebase.initializeApp(config);
+    firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+            console.log('User with ' + user.uid + ' has signed in.');
+            $('#auth_button').text('Log Out')
+        } else {
+            console.log('User hasn\'t signed in.');
+            if (firstTimeWindowOpened) {
+                $('#auth_modal_window').modal('show');
+            }
+            $('#auth_button').text('Log In')
+        }
+        firstTimeWindowOpened = false;
+    });
 
-    <!--run the drawing functionality after everything is loaded-->
-    <script type="text/javascript" src="DrawJS.js"></script>
-    <!--<script type="text/javascript" src="chat.js"></script>-->
+    function authButtonDidPress() {
+        // Check if user is signed in
+        if (firebase.auth().currentUser) {
+            // User is signed in
+            logOutWithEmailAndPassword();
+        } else {
+            // User is not signed in
+            $('#auth_modal_window').modal('show');
+        }
+    }
 
-      <!-- Firebase SDK-->
+    // changes a a button title in the auth window footer
+    function switchAuthModelWindowFooterButton() {
+        if (userCreatingAccount()) {
+            $('#auth_modal_window_title').text('Sign In');
+            $('#auth_modal_window_button').text('Sign In');
+            $('#auth_modal_window_footer_button').text('Don\'t have an account yet? Sign up here.');
+        } else {
+            $('#auth_modal_window_title').text('Create Account');
+            $('#auth_modal_window_button').text('Sign In');
+            $('#auth_modal_window_footer_button').text('Already have an account yet? Sign in here.');
+        }
+    }
 
-      <script>
-          let firstTimeWindowOpened = true;
+    // authenticates a user
+    function auth() {
+        const email = $('#auth_modal_window_email_text_field').val();
+        const password = $('#auth_modal_window_password_text_field').val();
 
-          // Initialize Firebase
-          const config = {
-              apiKey: "AIzaSyC15YosRivMEvcdkP09MHUYhQwi7VBgIWE",
-              authDomain: "drawing-project-seng-513.firebaseapp.com",
-              databaseURL: "https://drawing-project-seng-513.firebaseio.com",
-              projectId: "drawing-project-seng-513",
-              storageBucket: "drawing-project-seng-513.appspot.com",
-              messagingSenderId: "858775732575"
-          };
-          firebase.initializeApp(config);
-          firebase.auth().onAuthStateChanged(function(user) {
-              if (user) {
-                  console.log('User with ' + user.uid + ' has signed in.');
-                  $('#auth_button').text('Log Out')
-              } else {
-                  console.log('User hasn\'t signed in.');
-                  if (firstTimeWindowOpened) {
-                      $('#auth_modal_window').modal('show');
-                  }
-                  $('#auth_button').text('Log In')
-              }
-              firstTimeWindowOpened = false;
-          });
+        if (userCreatingAccount()) {
+            createUserWithEmailAndPassword(email, password);
+        } else {
+            logInWithEmailAndPassword(email, password);
+        }
+    }
 
-          function authButtonDidPress() {
-              // Check if user is signed in
-              if (firebase.auth().currentUser) {
-                  // User is signed in
-                  logOutWithEmailAndPassword();
-              } else {
-                  // User is not signed in
-                  $('#auth_modal_window').modal('show');
-              }
-          }
+    // creates an account in Firebase with an email and password
+    function createUserWithEmailAndPassword(email, password) {
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+            .then (function () {
+                $('#auth_modal_window').modal('hide');
+            })
+            .catch (function(error) {
+                let errorCode = error.code;
+                let errorMessage = error.message;
+                if (errorCode && errorMessage) {
+                    console.log(errorCode);
+                    console.log(errorMessage);
+                }
+            });
+    }
 
-          function switchAuthModelWindowFooterButton() {
-              if (userCreatingAccount()) {
-                  $('#auth_modal_window_title').text('Sign In');
-                  $('#auth_modal_window_button').text('Sign In');
-                  $('#auth_modal_window_footer_button').text('Don\'t have an account yet? Sign up here.');
-              } else {
-                  $('#auth_modal_window_title').text('Create Account');
-                  $('#auth_modal_window_button').text('Sign In');
-                  $('#auth_modal_window_footer_button').text('Already have an account yet? Sign in here.');
-              }
-          }
+    // signs in a user with an email and password
+    function logInWithEmailAndPassword(email, password) {
+        firebase.auth().signInWithEmailAndPassword(email, password)
+            .then (function () {
+                $('#auth_modal_window').modal('hide');
+            })
+            .catch (function(error) {
+                let errorCode = error.code;
+                let errorMessage = error.message;
+                if (errorCode && errorMessage) {
+                    console.log(errorCode);
+                    console.log(errorMessage);
+                }
+            });
+    }
 
-          // authenticates a user
-          function auth() {
-              const email = $('#auth_modal_window_email_text_field').val();
-              const password = $('#auth_modal_window_password_text_field').val();
+    function logOutWithEmailAndPassword() {
+        firebase.auth().signOut().then(function() {
+            console.log('User has signed out successfully.');
+        }).catch(function(error) {
+            console.log('Error: User could not sign out. ' + error);
+        });
+    }
 
-              if (userCreatingAccount()) {
-                  createUserWithEmailAndPassword(email, password);
-              } else {
-                  logInWithEmailAndPassword(email, password);
-              }
-          }
+    // check if a user currently have creating account UI
+    function userCreatingAccount() {
+        return $('#auth_modal_window_title').text() === 'Create Account';
+    }
 
-          // creates an account in Firebase with an email and password
-          function createUserWithEmailAndPassword(email, password) {
-             firebase.auth().createUserWithEmailAndPassword(email, password)
-                 .then (function () {
-                     $('#auth_modal_window').modal('hide');
-                 })
-                 .catch (function(error) {
-                      let errorCode = error.code;
-                      let errorMessage = error.message;
-                      if (errorCode && errorMessage) {
-                          console.log(errorCode);
-                          console.log(errorMessage);
-                      }
-                  });
-          }
+    /* Saved Pics */
 
-          // signs in a user with an email and password
-          function logInWithEmailAndPassword(email, password) {
-              firebase.auth().signInWithEmailAndPassword(email, password)
-                  .then (function () {
-                      $('#auth_modal_window').modal('hide');
-                  })
-                  .catch (function(error) {
-                      let errorCode = error.code;
-                      let errorMessage = error.message;
-                      if (errorCode && errorMessage) {
-                          console.log(errorCode);
-                          console.log(errorMessage);
-                      }
-                  });
-          }
-
-          function logOutWithEmailAndPassword() {
-              firebase.auth().signOut().then(function() {
-                  console.log('User has signed out successfully.');
-              }).catch(function(error) {
-                  console.log('Error: User could not sign out. ' + error);
-              });
-          }
-
-          // check if a user currently have creating account UI
-          function userCreatingAccount() {
-              return $('#auth_modal_window_title').text() === 'Create Account';
-          }
-
-          /* Saved Pics */
-
-          //
-          function renderSavedPictures() {
-              console.log("sup from renderSavedPictures");
-          }
-      </script>
-  </body>
+    //
+    function renderSavedPictures() {
+        console.log("sup from renderSavedPictures");
+        // TODO: stop the game
+        $("#main").empty();
+    }
+</script>
+</body>
 </html>
