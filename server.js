@@ -229,7 +229,7 @@ io.on('connection', function(socket){
 
     //when the client asks to reconnect back to game add him to the queue and scoreboard
     socket.on('reconnectToGame', function(queueInfo, scoreInfo){
-      drawUser.push(queueInfo);
+      drawUsers.push(queueInfo);
       scoreBoardUsers.push(scoreInfo);
       io.emit('updateScoreBoard', scoreBoardUsers);
     });

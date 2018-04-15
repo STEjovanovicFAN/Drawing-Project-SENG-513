@@ -154,7 +154,7 @@ socket.on('retreivedImage', function(img){
 });
 
 
-  function drawingModeClient(){
+function drawingModeClient(){
   //get the drawing word
   socket.emit('getDrawingWord');
 

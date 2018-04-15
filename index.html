@@ -233,7 +233,9 @@
         socket.emit('reconnectToGame', localQueueStore, localScoreStore);
         //set disconnect variable to false
         disconnect = false;
-        //initalize all the game elements
+
+
+        //initalize all the game element canvases elements
         $('#outer').empty();
 
         console.log("I am listening");
