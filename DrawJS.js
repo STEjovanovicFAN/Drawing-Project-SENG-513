@@ -107,6 +107,8 @@ function listenerModeClient(){
 
 }
 
+
+/* Database */
 function saveImg(){
   let obj = {};
   let imageString = JSON.stringify(canvas);
