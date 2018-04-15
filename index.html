@@ -205,7 +205,27 @@
 
     // renders the content of the page once a user clicks "Game" tab
     function renderGame() {
+        console.log("render the game state");
+        socket.emit('reconnectToGame', localQueueStore, localScoreStore);
+        //set disconnect variable to false
+        disconnect = false;
+        //initalize all the game elements
+        $('#outer').empty();
 
+        console.log("I am listening");
+        console.log("currentDrawingUser: " + currentDrawingUser);
+        $('#outer').append('<h1>Time left: <span id = time> </span></h1>')
+        $('#outer').append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>');
+
+        $('#guessbox').empty();
+        $('#guessbox').append('<input type = "text" onkeypress="checkForEnter(event)" id = "myGuess">');
+        $('#guessbox').append('<button id = "submitGuess">Send Message</button>');
+        $('#guessbox').append('<script> function checkForEnter(event){ if (event.which === 13){submitGuess();}}</script>');
+
+        var button = document.getElementById("submitGuess");
+
+        button.onclick = submitGuess;
+        listenerModeClient();
     }
 
     // renders the content of the page once a user clicks "Saved Pictures" tab
@@ -218,8 +238,21 @@
 
     // remove the user from the game (queue of players)
     function removeFromQueue() {
-        // TODO: Implement this function
+      disconnect = true;
+      socket.emit('removeMeFromGameState');
+
+      console.log("appending elements here");
+      //empty the screen and place elements for looking at pictures here
+      $('#outer').empty();
+      $('#outer').append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>');
     }
+
+    socket.on('confirmRemove', function(queInfo, scoreInfo){
+      //store the info on the client for when you want to reconnenctback
+      localScoreStore = scoreInfo;
+      localQueueStore = queInfo;
+    });
+
 </script>
 </body>
 </html>
