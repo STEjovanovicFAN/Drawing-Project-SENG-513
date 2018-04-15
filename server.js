@@ -4,7 +4,6 @@ var io = require('socket.io')(http);
 var port = process.env.PORT || 3000;
 
 // Firebase Admin SDK Setup
-/*
 const admin = require('firebase-admin');
 const serviceAccount = require('./keys/firebase-key.json');
 admin.initializeApp({
@@ -13,7 +12,6 @@ admin.initializeApp({
 });
 // reference to the Firebase Database
 const db = admin.database();
-*/
 
 //drawing variables
 var drawingWordsDictionary = ["pen", "jar","ocean","worm", "cloud", "fly", "lollipop", "wheel", "apple", "triangle", "diamond", "lemon", "pig", "fire", "ring", "motorcycle", "water", "glasses", "kitten", "octopus", "eye",
@@ -67,7 +65,7 @@ app.get('/DrawJS.js', function(req, res){
 //create a timer for 60 seconds, update clients every second (1000ms)
 function startNewTimer(){
 		//console.log("i reset the timer");
-    time = 60;
+    time = 15;
     //while timer is running, send the current time for this round
     var timer = setInterval(function(){
       if(time >= 0){
@@ -133,6 +131,7 @@ io.on('connection', function(socket){
 		"userName" : "tempUser" + countUsers, //for authentication change this
 		"color" : thisUserColor
   }
+
   //give socket its id and name and color
   socket.emit('pushSocketID', countUsers);
 	socket.emit('pushSocketName', "tempUser" + countUsers);
@@ -205,6 +204,34 @@ io.on('connection', function(socket){
                 console.log(errorMessage);
             }
         });
+    });
+
+    //if a user asks to be disconnected from the game, disconnect them from the game
+    socket.on('removeMeFromGameState', function(){
+      //find the index where it is in queue
+      var index = drawUsers.findIndex(x => x.socketID===socket.id);
+      var storeQue = drawUsers[index];
+      //take it out of queue
+      drawUsers.splice(index,1);
+
+      //find the index of this user in the scoreboard
+      index = scoreBoardUsers.findIndex(x => x.socketID===socket.id);
+      var storeScore = scoreBoardUsers[index];
+      //take it out of the scoreboard
+      scoreBoardUsers.splice(index,1);
+
+      //update the scoreboard
+      io.emit('updateScoreBoard', scoreBoardUsers);
+
+      //now confirm this with the client that asked to be removed from the game
+      socket.emit('confirmRemove', storeQue, storeScore);
+    });
+
+    //when the client asks to reconnect back to game add him to the queue and scoreboard
+    socket.on('reconnectToGame', function(queueInfo, scoreInfo){
+      drawUser.push(queueInfo);
+      scoreBoardUsers.push(scoreInfo);
+      io.emit('updateScoreBoard', scoreBoardUsers);
     });
 
 	socket.on('disconnect', function(){

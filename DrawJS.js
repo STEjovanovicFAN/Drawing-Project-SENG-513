@@ -4,6 +4,11 @@ var userID;
 var userName; //for authentication change this name
 var userColor;
 var canvas;
+var disconnect = false;
+var localQueueStore;
+var localScoreStore;
+
+
 //get this sockets id
 socket.on('pushSocketID', function(thisUserID){
   userID = thisUserID;
@@ -49,24 +54,30 @@ socket.on('whosDrawing', function(currentDrawingUser){
   }
   //otherwise you are the listener
   else{
-    $('#outer').empty();
+    if(disconnect==false){
+      $('#outer').empty();
 
-    console.log("I am not listening");
-    console.log("currentDrawingUser: " + currentDrawingUser);
-    $('#outer').append('<h1>Time left: <span id = time> </span></h1>')
-    $('#outer').append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>');
+      console.log("I am listening");
+      console.log("currentDrawingUser: " + currentDrawingUser);
+      $('#outer').append('<h1>Time left: <span id = time> </span></h1>')
+      $('#outer').append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>');
 
-    $('#guessbox').empty();
-    $('#guessbox').append('<input type = "text" onkeypress="checkForEnter(event)" id = "myGuess">');
-    $('#guessbox').append('<button id = "submitGuess">Send Message</button>');
-    $('#guessbox').append('<script> function checkForEnter(event){ if (event.which === 13){submitGuess();}}</script>');
+      $('#guessbox').empty();
+      $('#guessbox').append('<input type = "text" onkeypress="checkForEnter(event)" id = "myGuess">');
+      $('#guessbox').append('<button id = "submitGuess">Send Message</button>');
+      $('#guessbox').append('<script> function checkForEnter(event){ if (event.which === 13){submitGuess();}}</script>');
 
 
-    var button = document.getElementById("submitGuess");
+      var button = document.getElementById("submitGuess");
 
-    button.onclick = submitGuess;
-    listenerModeClient();
+      button.onclick = submitGuess;
+      listenerModeClient();
+    }
 
+    //otherwise if its true do nothing
+    else{
+
+    }
   }
 });
 
@@ -78,7 +89,9 @@ function listenerModeClient(){
   //get the current time left from the server and display it
   socket.on('send current time', function(currentTime){
     //console.log(currentTime);
-    document.getElementById("time").innerHTML = currentTime;
+    if(disconnect != true){
+      document.getElementById("time").innerHTML = currentTime;
+    }
   });
 
   socket.on('receive data', function(data){
@@ -157,7 +170,9 @@ socket.on('retreivedImage', function(img){
   //get the current time left from the server and display it
   socket.on('send current time', function(currentTime){
     //console.log(currentTime);
-    document.getElementById("time").innerHTML = currentTime;
+    if(disconnect != true){
+      document.getElementById("time").innerHTML = currentTime;
+    }
   });
 
   //set the new canvas to be able to draw
@@ -303,7 +318,7 @@ socket.on('updateScoreBoard', function(arrayOfScores){
 
 //when given a client message broadcast it to the side
 socket.on('broadcastMessage', function(givenMessage, msgUser, msgColor, timeGiven){
-  console.log(givenMessage);
+  console.log("test");
 
   $('#messages').append('<li>' + '<font color =' + msgColor + '>' + timeGiven + msgUser + ": "+ '</font>' +  givenMessage + '</li>');
 });
