@@ -276,7 +276,7 @@ function submitGuess(){
 socket.on('correctGuess', function(score){
   console.log("you were right");
   $('#scoreField').empty()
-  .append('Score: ' + score);
+  .append(' Your Score: ' + score);
   /*
   var button = document.getElementById("submitGuess");
 
@@ -285,7 +285,19 @@ socket.on('correctGuess', function(score){
   */
   //$('#guessbox').append('<h1>Congratulations! you guessed correctly</h1>');
 
-})
+});
+
+//then this is called by the server update the scoreboard fro the client to see
+socket.on('updateScoreBoard', function(arrayOfScores){
+  //first empty the scoreboard
+  $('#scoreBoard').empty();
+
+  //now initalize the scoreboard with the appropriate updated values
+  for(var i = 0; i < arrayOfScores.length; i++){
+    //take the i'th player and append him to the scoreboard
+    $('#scoreBoard').append('<h2><font color =' + arrayOfScores[i].color + '>' + arrayOfScores[i].userName + '</font>' + ": " + arrayOfScores[i].score + '</h2>')
+  }
+});
 
 //when given a client message broadcast it to the side
 socket.on('broadcastMessage', function(givenMessage, msgUser, msgColor, timeGiven){

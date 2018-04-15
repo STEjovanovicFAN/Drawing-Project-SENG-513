@@ -4,6 +4,7 @@ var io = require('socket.io')(http);
 var port = process.env.PORT || 3000;
 
 // Firebase Admin SDK Setup
+/*
 const admin = require('firebase-admin');
 const serviceAccount = require('./keys/firebase-key.json');
 admin.initializeApp({
@@ -12,6 +13,7 @@ admin.initializeApp({
 });
 // reference to the Firebase Database
 const db = admin.database();
+*/
 
 //drawing variables
 var drawingWordsDictionary = ["pen", "jar","ocean","worm", "cloud", "fly", "lollipop", "wheel", "apple", "triangle", "diamond", "lemon", "pig", "fire", "ring", "motorcycle", "water", "glasses", "kitten", "octopus", "eye",
@@ -26,6 +28,7 @@ var drawingWordsDictionary = ["pen", "jar","ocean","worm", "cloud", "fly", "loll
 "alive", "bow", "suitcase", "elephant", "dog", "shoe", "moon", "lamp", "mouse", "bone", "curl", "truck", "island", "knee", "zebra", "corn", "man", "grapes", "dream", "bug", "mountains", "lips", "baseball",
 "key", "coin", "hook", "arm", "computer", "lizard", "time", "bee", "slide", "mitten", "rock", "head", "helicopter", "earth"];
 var drawUsers = [];
+var scoreBoardUsers = [];
 var currentWord = " ";
 var countUsers = 0;
 var time = 0;
@@ -150,6 +153,9 @@ io.on('connection', function(socket){
   //update users and push this new user into our drawing queue
   countUsers++;
   drawUsers.push(user1);
+  //put user into our score board too and update clients about the score board
+  scoreBoardUsers.push(user1);
+  io.emit('updateScoreBoard', scoreBoardUsers);
 
 	socket.on('getDrawingWord', function(){
     //choose a random word
@@ -205,9 +211,16 @@ io.on('connection', function(socket){
 		/*users = [];
 		io.emit('getUsers');
 */
-    //get the index and take this user out of the list
+    //get the index and take this user out of the queue
     var index = drawUsers.findIndex(x => x.socketID===socket.id);
     drawUsers.splice(index,1);
+
+    //get the index and take the user out of the scoreboard
+    index = scoreBoardUsers.findIndex( x => x.socketID ===socket.id);
+    scoreBoardUsers.splice(index,1);
+    //update scoreboard
+    io.emit('updateScoreBoard', scoreBoardUsers);
+
 	});
 
 
@@ -268,7 +281,10 @@ io.on('connection', function(socket){
     if(userGuess === currentWord){
       //console.log("you guessed correctly");
 			var myid = socket.id;
+      //index for queue
 			var index = drawUsers.findIndex(x => x.socketID===socket.id);
+      //index for the scoreboard
+      var index1 = scoreBoardUsers.findIndex(x => x.socketID===socket.id);
 
 			//console.log(drawUsers[index].guessedCorrectly);
 			if(drawUsers[index].guessedCorrectly === false){
@@ -276,6 +292,7 @@ io.on('connection', function(socket){
 				if(firstGuess == false){
 					//console.log("user hasn't guessed before, update score");
 					drawUsers[index].score += 20;
+          //scoreBoardUsers[index1].score += 20; //here
 					firstGuess = true;
 
 					//format the server text message
@@ -285,21 +302,33 @@ io.on('connection', function(socket){
 				}
 				else{
 					drawUsers[index].score += 10;
+          //scoreBoardUsers[index1].score += 10; //here
 					var getUserName = drawUsers[index].userName;
 					serverMSG = " guessed the word correctly!";
 
 				}
 				drawUsers[index].guessedCorrectly = true;
-				console.log(drawUsers[index].score);
+				//console.log(drawUsers[index].score);
 
 				//add points to drawer if another person guessed his shit correctly
 				var addPointsToDrawer = drawUsers[0].socketID;
 				drawUsers[0].score += 10;
+
+        //update for the scoreboard
+        //find the current drawing id
+        for(var k = 0 ; k < scoreBoardUsers.length; k++){
+          //check if its the current drawing user
+          if(scoreBoardUsers[k].id === currentDrawingID){
+            scoreBoardUsers[k].score += 10;
+          }
+        }
+
 				io.to(addPointsToDrawer).emit('correctGuess', drawUsers[0].score);
 
 				//need to change this emit statement JEFF
 				io.to(myid).emit('correctGuess', drawUsers[index].score);
-
+        //broadcast the user score list
+        io.emit('updateScoreBoard', scoreBoardUsers);
 
 			}
 			//if already guessed do nothing but format the serverMSG
@@ -318,9 +347,6 @@ io.on('connection', function(socket){
   }
 
 });
-
-
-
 
 http.listen(port, function(){
     console.log('The server is listening on: ' + port + ' port.');
