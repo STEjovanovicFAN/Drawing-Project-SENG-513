@@ -22,7 +22,7 @@
             <div class="modal-header">
                 <h1 class="modal-title" id="auth_modal_window_title">Create Account</h1>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">x</span>
+                    <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
@@ -43,9 +43,6 @@
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
                 <a class="nav-link" href="#">Game<span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">My Account</a>
             </li>
             <li class="nav-item my-2 my-lg-0">
                 <a class="nav-link" href="#" onclick="renderSavedPictures()">Saved Pictures</a>
@@ -92,8 +89,8 @@
 <!--run the drawing functionality after everything is loaded-->
 <script type="text/javascript" src="DrawJS.js"></script>
 <!--<script type="text/javascript" src="chat.js"></script>-->
-<!-- Firebase SDK-->
 <script>
+    /* Firebase SDK */
     let firstTimeWindowOpened = true;
     // Initialize Firebase
     const config = {
@@ -127,19 +124,6 @@
         } else {
             // User is not signed in
             $('#auth_modal_window').modal('show');
-        }
-    }
-
-    // changes a a button title in the auth window footer
-    function switchAuthModelWindowFooterButton() {
-        if (userCreatingAccount()) {
-            $('#auth_modal_window_title').text('Sign In');
-            $('#auth_modal_window_button').text('Sign In');
-            $('#auth_modal_window_footer_button').text('Don\'t have an account yet? Sign up here.');
-        } else {
-            $('#auth_modal_window_title').text('Create Account');
-            $('#auth_modal_window_button').text('Sign In');
-            $('#auth_modal_window_footer_button').text('Already have an account yet? Sign in here.');
         }
     }
 
@@ -195,18 +179,42 @@
         });
     }
 
+    /* UI */
+
+    // changes a a button title in the auth window footer
+    function switchAuthModelWindowFooterButton() {
+        if (userCreatingAccount()) {
+            $('#auth_modal_window_title').text('Sign In');
+            $('#auth_modal_window_button').text('Sign In');
+            $('#auth_modal_window_footer_button').text('Don\'t have an account yet? Sign up here.');
+        } else {
+            $('#auth_modal_window_title').text('Create Account');
+            $('#auth_modal_window_button').text('Sign In');
+            $('#auth_modal_window_footer_button').text('Already have an account yet? Sign in here.');
+        }
+    }
+
     // check if a user currently have creating account UI
     function userCreatingAccount() {
         return $('#auth_modal_window_title').text() === 'Create Account';
     }
 
-    /* Saved Pics */
+    // renders the content of the page once a user clicks "Game" tab
+    function renderGame() {
 
-    //
+    }
+
+    // renders the content of the page once a user clicks "Saved Pictures" tab
     function renderSavedPictures() {
+        removeFromQueue();
         console.log("sup from renderSavedPictures");
-        // TODO: stop the game
-        $("#main").empty();
+        $('#outer').empty();
+        $('#outer').append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>');
+    }
+
+    // remove the user from the game (queue of players)
+    function removeFromQueue() {
+        // TODO: Implement this function
     }
 </script>
 </body>
