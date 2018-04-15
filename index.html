@@ -192,8 +192,6 @@
         let $this = $(this);
         if (!$this[0].className.includes('active')) {
             $('.navbar li.active').removeClass('active');
-
-            console.log($this);
             if (!$this.hasClass('active')) {
                 $this.addClass('active');
             }
@@ -202,7 +200,6 @@
                 renderSavedPictures();
             } else if ($this[0].innerText === 'Game\n') {
                 renderGame();
-                console.log(2);
             }
             e.preventDefault();
         }
@@ -227,6 +224,10 @@
     }
 
     // renders the content of the page once a user clicks "Game" tab
+    function renderGamee() {
+
+    }
+
     function renderGame() {
         console.log("render the game state");
         socket.emit('reconnectToGame', localQueueStore, localScoreStore);
@@ -236,14 +237,17 @@
         $('#outer').empty();
 
         console.log("I am listening");
-        console.log("currentDrawingUser: " + currentDrawingUser);
-        $('#outer').append('<h1>Time left: <span id = time> </span></h1>')
+        //console.log("currentDrawingUser: " + currentDrawingUser);
+        $('#outer').append('<h1>Time left: <span id = time> </span></h1>');
         $('#outer').append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>');
 
         $('#guessbox').empty();
         $('#guessbox').append('<input type = "text" onkeypress="checkForEnter(event)" id = "myGuess">');
-        $('#guessbox').append('<button id = "submitGuess">Send Message</button>');
-        $('#guessbox').append('<script> function checkForEnter(event){ if (event.which === 13){submitGuess();}}</script>');
+        $('#guessbox').append('<button id="submitGuess">Send Message</button>');
+        let script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = 'function checkForEnter(event){ if (event.which === 13) {submitGuess();}}';
+        $('#guessbox').append(script);
 
         var button = document.getElementById("submitGuess");
 
@@ -279,3 +283,5 @@
 </script>
 </body>
 </html>
+<!--
+        //$('#guessbox').append('<script> function checkForEnter(event){ if (event.which === 13) {submitGuess();}}</script>'); -->
