@@ -26,7 +26,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <input type="text" class="form-control" id="auth_modal_window_email_text_field" name="username" placeholder="Email Address" required="" autofocus="" />
+                <input type="text" class="form-control" id="auth_modal_window_email_text_field" name="username" placeholder="Email Address" required="" autofocus=""/>
                 <input type="password" class="form-control" id="auth_modal_window_password_text_field" name="password" placeholder="Password" required=""/>
                 <button class="btn btn-lg btn-primary btn-block" id="auth_modal_window_button" type="submit" onclick="auth()">Create Account</button>
             </div>
@@ -224,34 +224,30 @@
     }
 
     // renders the content of the page once a user clicks "Game" tab
-    function renderGamee() {
-
-    }
-
     function renderGame() {
         console.log("render the game state");
         socket.emit('reconnectToGame', localQueueStore, localScoreStore);
         //set disconnect variable to false
         disconnect = false;
 
-
         //initalize all the game element canvases elements
-        $('#outer').empty();
-
+        let outer = $('#outer');
+        outer.empty();
         console.log("I am listening");
         //console.log("currentDrawingUser: " + currentDrawingUser);
-        $('#outer').append('<h1>Time left: <span id = time> </span></h1>');
-        $('#outer').append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>');
+        outer.append('<h1>Time left: <span id = time> </span></h1>');
+        outer.append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>');
 
-        $('#guessbox').empty();
-        $('#guessbox').append('<input type = "text" onkeypress="checkForEnter(event)" id = "myGuess">');
-        $('#guessbox').append('<button id="submitGuess">Send Message</button>');
+        let guessbox = $('#guessbox');
+        guessbox.empty();
+        guessbox.append('<input type = "text" onkeypress="checkForEnter(event)" id = "myGuess">');
+        guessbox.append('<button id="submitGuess">Send Message</button>');
         let script = document.createElement('script');
         script.type = 'text/javascript';
         script.src = 'function checkForEnter(event){ if (event.which === 13) {submitGuess();}}';
-        $('#guessbox').append(script);
+        guessbox.append(script);
 
-        var button = document.getElementById("submitGuess");
+        let button = document.getElementById("submitGuess");
 
         button.onclick = submitGuess;
         listenerModeClient();
@@ -261,25 +257,28 @@
     function renderSavedPictures() {
         removeFromQueue();
         console.log("sup from renderSavedPictures");
-        $('#outer').empty();
-        $('#outer').append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>');
+        let main = $('#main');
+        let footer = $('footer');
+        main.empty();
+        footer.empty();
+        main.append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>');
     }
 
     // remove the user from the game (queue of players)
     function removeFromQueue() {
-      disconnect = true;
-      socket.emit('removeMeFromGameState');
-
-      console.log("appending elements here");
-      //empty the screen and place elements for looking at pictures here
-      $('#outer').empty();
-      $('#outer').append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>');
+        disconnect = true;
+        socket.emit('removeMeFromGameState');
+        console.log("appending elements here");
+        //empty the screen and place elements for looking at pictures here
+        let outer = $('#outer');
+        outer.empty();
+        outer.append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>');
     }
 
-    socket.on('confirmRemove', function(queInfo, scoreInfo){
-      //store the info on the client for when you want to reconnenctback
-      localScoreStore = scoreInfo;
-      localQueueStore = queInfo;
+    socket.on('confirmRemove', function(queInfo, scoreInfo) {
+        //store the info on the client for when you want to reconnect back
+        localScoreStore = scoreInfo;
+        localQueueStore = queInfo;
     });
 
 </script>

@@ -52,7 +52,6 @@ let scoreBoardUsers = [];
 let currentWord = " ";
 let countUsers = 0;
 let time = 0;
-let totalClients = 0;
 let currentDrawingID = " ";
 let firstGuess = false;
 
@@ -112,7 +111,7 @@ function startNewTimer() {
 /* Socket */
 
 // send id of whos drawing
-io.on('getWhosDrawing', function () {
+io.on('getWhosDrawing', function (socket) {
     socket.emit('whosDrawing', currentDrawingUser);
 });
 
@@ -195,8 +194,7 @@ io.on('connection', function(socket) {
         admin.auth().verifyIdToken(obj.token)
             .then(function(decodedToken) {
                 let uid = decodedToken.uid;
-                let image = readImageFromDB(uid, obj.index, socket.id);
-
+                readImageFromDB(uid, obj.index, socket.id);
             }).catch(function(error) {
             let errorCode = error.code;
             let errorMessage = error.message;
@@ -302,25 +300,22 @@ io.on('connection', function(socket) {
             let myid = socket.id;
 			// index for queue
             let index = drawUsers.findIndex(x => x.socketID === socket.id);
-			// index for the scoreboard
-            let index1 = scoreBoardUsers.findIndex(x => x.socketID === socket.id);
 
 			// console.log(drawUsers[index].guessedCorrectly);
 			if (drawUsers[index].guessedCorrectly === false) {
 			    //console.log("user guessed correctly");
-                if (firstGuess == false) {
+                if (!firstGuess) {
                     // console.log("user hasn't guessed before, update score");
 					drawUsers[index].score += 20;
-					// scoreBoardUsers[index1].score += 20; //here
 					firstGuess = true;
 
 					// format the server text message
                     let getUserName = drawUsers[index].userName;
-					serverMSG = " guessed the word correctly! 20 points awarded for being the first to guess the word!";
+					serverMSG = getUserName + ' guessed the word correctly! 20 points awarded for being the first to guess the word!';
 				} else {
                     drawUsers[index].score += 10;
                     let getUserName = drawUsers[index].userName;
-					serverMSG = " guessed the word correctly!";
+					serverMSG = getUserName + ' guessed the word correctly!';
 				}
 				drawUsers[index].guessedCorrectly = true;
 
@@ -372,7 +367,8 @@ function DisplayCurrentTime() {
 	let date = new Date();
     let hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
     let minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
-	return "[" + hours + ":" + minutes + "] "; //":"// + seconds;
+    let returnValue = "[" + hours + ":" + minutes + "] ";
+	return returnValue;
 }
 
 /*
