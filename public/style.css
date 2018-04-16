@@ -1,7 +1,7 @@
 
   #cont {
     position: relative;
-    width: 1000px;
+    width: 800px;
     height: 600px;
   }
   #draw{
@@ -30,7 +30,7 @@
   }
   #wordHeading{
     font-family: 'Gaegu', cursive;
-    color:#ABD1B5;
+    color:#000009;
     font-weight: bolder
   }
   #time{
@@ -43,7 +43,7 @@
     font-family: 'Gaegu', cursive;
     color:#C33C54;
     font-weight: bolder;
-    color: #ABD1B5
+    color: #000009;
   }
   canvas {
     border: 1px solid;
@@ -61,7 +61,7 @@
     pointer-events: none!important;
   }
   #usernamePanel{
-    background: whitesmoke;
+    background: black;
     padding-top: 1%;      /*panel*/
     padding-left: 2%;
     height:5%;
@@ -93,13 +93,14 @@
     margin-bottom: -10px;
     height:93%;
     width: 100%;
-    position: relative;    
+    position: relative;
+    color: white;    
   }
   .chatbox ul{
     list-style-type: none;
     height:98%;
     width: 100%;
-    background: white;
+    background:#175676;
     overflow-y: scroll;
     position: absolute;
     overflow-wrap: break-word;
@@ -109,6 +110,7 @@
     height:auto;
   }
   .messagePanel{
+    background:gray;
     
   }
   .messagePanel input[type=text]{
@@ -171,8 +173,12 @@ body {
 #main > article > #title > #scoreBoard {
   border-collapse: collapse;
   padding-right: 100px;
-  width: 300px;
+  width: 250px;
   table-layout: fixed;
+}
+
+#title{
+  padding-left: 30px;
 }
 
 #main > article > #title > #scoreBoard, td, th {
@@ -185,7 +191,6 @@ body {
 
 #navbar>#logout-button{
   float: right;
-  background: red;
 }
 
 header, footer {
@@ -222,9 +227,10 @@ footer > #score{
 }
 
 #savepic{
-  align:left;
-  display:inline;
-  position: relative;
+  border: black;
+  position: absolute;
+  top: 800px;
+  left: 900px;
 
 }
 

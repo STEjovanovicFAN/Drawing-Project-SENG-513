@@ -54,7 +54,7 @@ socket.on('whosDrawing', function(currentDrawingUser){
     console.log("I am now drawing");
     console.log("currentDrawingUser: " + currentDrawingUser);
     $('#outer').append('<h1 id="wordHeading">Your word is: <span id = word>null</span></h1>')
-    $('#outer').append('<div id="cont"> <canvas id="draw" width="1000" height="600"></canvas> <canvas id="cursor" width="1000" height="600"></canvas></div>');
+    $('#outer').append('<div id="cont"> <canvas id="draw" width="800" height="600"></canvas> <canvas id="cursor" width="800" height="600"></canvas></div>');
     $('#outer').append('<h1 style="float:right;"><span id="timeLeft">Time left: </span> <span id = time> </span></h1>');
     $('#outer').append('<h2><span id="timeLeft">Brush: </span><input id="color" type="color" value="#000000"></h2>')
     $('#outer').append('<input id="size" type="range" min="1" max="100" step="1" value="20" align="right">')
