@@ -248,6 +248,21 @@ io.on('connection', function(socket) {
         io.emit('updateScoreBoard', scoreBoardUsers);
     });
 
+    //when client is authenticated(logged on) and requests a name change
+    socket.on('changeNickName', function(newNameOfClient){
+      console.log("inside of change nick name");
+      //find the client in drawUsers and scoreBoardUsers and change its name, after update the scoreBoard
+      let index = drawUsers.findIndex(x => x.socketID === socket.id);
+      drawUsers[index].userName = newNameOfClient;
+
+      index = scoreBoardUsers.findIndex( x => x.socketID === socket.id);
+      scoreBoardUsers[index].userName = newNameOfClient;
+
+      console.log(scoreBoardUsers);
+      //update scoreBoard
+      io.emit('updateScoreBoard', scoreBoardUsers);
+    });
+
 	socket.on('disconnect', function() {
         // get the index and take this user out of the queue
         let index = drawUsers.findIndex(x => x.socketID === socket.id);

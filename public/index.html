@@ -66,18 +66,18 @@
                 <table id ="myTable">
                 </table>
             </div>
-            <button id = "savepic" onclick="saveImg()" type="button" class="btn btn-primary">Save Image</button>   
+            <button id = "savepic" onclick="saveImg()" type="button" class="btn btn-primary">Save Image</button>
         </div>
 
 
     </article>
-    
+
     <aside>
         <div class="chatContainer">
-            <div id="usernamePanel"><span id=usersName></span></div>         
-            <div id="chat" class="chatbox"><ul id="messages"></ul></div> 
+            <div id="usernamePanel"><span id=usersName></span></div>
+            <div id="chat" class="chatbox"><ul id="messages"></ul></div>
             <div id="guessbox" class="messagePanel"></div>
-        </div>           
+        </div>
       </aside>
 
 </div>
@@ -179,6 +179,8 @@
                     .then (function(snapshot) {
                         userName = snapshot.val().nickname;
                         console.log(snapshot.val().nickname);
+                        document.getElementById('usersName').innerHTML=userName;
+                        socket.emit('changeNickName', userName);
                     });
             })
             .catch (function(error) {
@@ -252,7 +254,7 @@
         console.log("I am listening");
         //console.log("currentDrawingUser: " + currentDrawingUser);
         outer.append('<h1>Time left: <span id = time> </span></h1>');
-        outer.append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>');
+        outer.append('<div id="cont"> <canvas id="draw" width="1000" height="600"></canvas></div>');
         let guessbox = $('#guessbox');
         guessbox.empty();
         guessbox.append('<input type = "text" onkeypress="checkForEnter(event)" id = "myGuess">');
@@ -276,7 +278,7 @@
         main.empty();
         main.append('<div id="savedPicContainer"><table>');
         main.append('<tr><td id="left"><button id="left_button" type="button" class="btn btn-primary" onclick="leftButtonDidPress()"></span>←</button></td>');
-        main.append('<td><div id="cont"><canvas id="draw" width="500" height="500"></canvas></div><td>');
+        main.append('<td><div id="cont"> <canvas id="draw" width="1000" height="600"></canvas></div><td>');
         main.append('<td id="right"><button id="right_button" type="button" class="btn btn-primary" onclick="rightButtonDidPress()">→</span></button></td></tr>');
         main.append('</table></div>');
         canvas = new fabric.StaticCanvas("draw", {});
@@ -305,7 +307,7 @@
         //empty the screen and place elements for looking at pictures here
         let outer = $('#outer');
         outer.empty();
-        outer.append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>');
+        outer.append('<div id="cont"> <canvas id="draw" width="1000" height="600"></canvas></div>');
     }
 
     function getImage() {

@@ -18,9 +18,13 @@ socket.on('pushSocketID', function(thisUserID){
 
 //get this sockets id
 socket.on('nicknameFromDB', function(nickname) {
+    //set clients nick name to be userName
+    console.log(nickname);
     userName = nickname;
     document.getElementById('usersName').innerHTML=userName;
     console.log(userName);
+    //send to server to change drawUsers and scoreBoardUsers nicknames
+    socket.emit('changeNickName', nickname);
 });
 
 //get this socket it's name
