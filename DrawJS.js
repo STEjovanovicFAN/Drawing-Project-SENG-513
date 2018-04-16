@@ -314,7 +314,7 @@ socket.on('updateScoreBoard', function(arrayOfScores){
   //now initalize the scoreboard with the appropriate updated values
   for(var i = 0; i < arrayOfScores.length; i++){
     //take the i'th player and append him to the scoreboard
-    $('#scoreBoard').append('<h2><font color =' + arrayOfScores[i].color + '>' + arrayOfScores[i].userName + '</font>' + ": " + arrayOfScores[i].score + '</h2>')
+    $('#scoreBoard').append('<h2 id="scoreboardText"><font color =' + arrayOfScores[i].color + '>' + arrayOfScores[i].userName + '</font>' + ": " + arrayOfScores[i].score + '</h2>')
   }
 });
 
