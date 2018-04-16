@@ -174,8 +174,13 @@
     // signs in a user with an email and password
     function logInWithEmailAndPassword(email, password) {
         firebase.auth().signInWithEmailAndPassword(email, password)
-            .then (function () {
+            .then (function (user) {
                 $('#auth_modal_window').modal('hide');
+                firebase.database().ref('nicknames/' + user.uid).once('value')
+                    .then (function(snapshot) {
+                        userName = snapshot.val().nickname;
+                        console.log(snapshot.val().nickname);
+                    });
             })
             .catch (function(error) {
                 let errorCode = error.code;
@@ -270,13 +275,27 @@
         console.log("sup from renderSavedPictures");
         let main = $('#main');
         main.empty();
-        footer.empty();
         main.append('<div id="savedPicContainer"><table>');
-        main.append('<tr><td id="left"><button id="left" onclick="" type="button" class="btn btn-primary"></span>←</button></td>');
-        main.append('<td><div id="cont"><canvas id="draw" width="500" height="500"></canvas></div><td>');        
-        main.append('<td id="right"><button id="left" onclick="" type="button" class="btn btn-primary">→</span></button></td></tr>');
+        main.append('<tr><td id="left"><button id="left_button" type="button" class="btn btn-primary" onclick="leftButtonDidPress()"></span>←</button></td>');
+        main.append('<td><div id="cont"><canvas id="draw" width="500" height="500"></canvas></div><td>');
+        main.append('<td id="right"><button id="right_button" type="button" class="btn btn-primary" onclick="rightButtonDidPress()">→</span></button></td></tr>');
         main.append('</table></div>');
+        canvas = new fabric.StaticCanvas("draw", {});
+        getImage();
+    }
 
+    function leftButtonDidPress() {
+        if (photoIndex > 0) {
+            photoIndex--;
+        }
+        console.log('sup from left' + photoIndex);
+        getImage();
+    }
+
+    function rightButtonDidPress() {
+        photoIndex++;
+        console.log('sup from right' + photoIndex);
+        getImage();
     }
 
     // remove the user from the game (queue of players)
@@ -288,6 +307,24 @@
         let outer = $('#outer');
         outer.empty();
         outer.append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>');
+    }
+
+    function getImage() {
+        let obj = {};
+        obj.index = photoIndex;
+        firebase.auth().currentUser.getIdToken(true)
+            .then(function (idToken) {
+                obj.token = idToken;
+                socket.emit('readCanvas', obj);
+            })
+            .catch (function (error) {
+                let errorCode = error.code;
+                let errorMessage = error.message;
+                if (errorCode && errorMessage) {
+                    console.log(errorCode);
+                    console.log(errorMessage);
+                }
+            });
     }
 
     socket.on('confirmRemove', function(queInfo, scoreInfo) {

@@ -427,17 +427,22 @@ function readImageFromDB(uid, index, sid) {
     return firstQuery.once('value')
         .then (function(snapshot) {
             let i = 0;
+            let sent = false;
             snapshot.forEach(function (child) {
                 if (index === i) {
                     let image = child.val().image;
                     console.log("trying to emit to " + sid);
+                    sent = true;
                     io.to(sid).emit('retreivedImage', image);
                 }
+
                 i++;
             });
+            if (!sent) {
+                io.to(sid).emit('retreivedImage', null);
+            }
         });
 }
-
 
 /*
 Writes an image to the database
@@ -447,7 +452,7 @@ image - serialized image.
  */
 function writeNicknameToDB(uid, nickname, sid) {
     console.log("in writeNicknameToDB");
-    let ref = db.ref('nicknames/' + uid).push();
+    let ref = db.ref('nicknames/' + uid);
 
     ref.set({nickname: nickname})
         .then (function () {
