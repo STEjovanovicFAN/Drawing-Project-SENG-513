@@ -173,8 +173,13 @@
     // signs in a user with an email and password
     function logInWithEmailAndPassword(email, password) {
         firebase.auth().signInWithEmailAndPassword(email, password)
-            .then (function () {
+            .then (function (user) {
                 $('#auth_modal_window').modal('hide');
+                firebase.database().ref('nicknames/' + user.uid).once('value')
+                    .then (function(snapshot) {
+                        userName = snapshot.val().nickname;
+                        console.log(snapshot.val().nickname);
+                    });
             })
             .catch (function(error) {
                 let errorCode = error.code;

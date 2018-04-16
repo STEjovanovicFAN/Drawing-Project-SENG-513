@@ -445,7 +445,6 @@ function readImageFromDB(uid, index, sid) {
         });
 }
 
-
 /*
 Writes an image to the database
 
@@ -454,7 +453,7 @@ image - serialized image.
  */
 function writeNicknameToDB(uid, nickname, sid) {
     console.log("in writeNicknameToDB");
-    let ref = db.ref('nicknames/' + uid).push();
+    let ref = db.ref('nicknames/' + uid);
 
     ref.set({nickname: nickname})
         .then (function () {
