@@ -190,11 +190,28 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('readCanvas', function(obj) {
-    console.log("in read canvas");
+        console.log("in read canvas");
         admin.auth().verifyIdToken(obj.token)
             .then(function(decodedToken) {
                 let uid = decodedToken.uid;
                 readImageFromDB(uid, obj.index, socket.id);
+            }).catch(function(error) {
+            let errorCode = error.code;
+            let errorMessage = error.message;
+            if (errorCode && errorMessage) {
+                console.log(errorCode);
+                console.log(errorMessage);
+            }
+        });
+    });
+
+    socket.on('nickname', function(obj) {
+        console.log('in nickname');
+        admin.auth().verifyIdToken(obj.token)
+            .then(function(decodedToken) {
+                let uid = decodedToken.uid;
+                let nickname = obj.nickname;
+                writeNicknameToDB(uid, nickname, socket.id);
             }).catch(function(error) {
             let errorCode = error.code;
             let errorMessage = error.message;
@@ -419,5 +436,30 @@ function readImageFromDB(uid, index, sid) {
                 }
                 i++;
             });
+        });
+}
+
+
+/*
+Writes an image to the database
+
+uid - Firebase unique id,
+image - serialized image.
+ */
+function writeNicknameToDB(uid, nickname, sid) {
+    console.log("in writeNicknameToDB");
+    let ref = db.ref('nicknames/' + uid).push();
+
+    ref.set({nickname: nickname})
+        .then (function () {
+            io.to(sid).emit('nicknameFromDB', nickname);
+        })
+        .catch (function(error) {
+            let errorCode = error.code;
+            let errorMessage = error.message;
+            if (errorCode && errorMessage) {
+                console.log(errorCode);
+                console.log(errorMessage);
+            }
         });
 }

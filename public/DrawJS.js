@@ -15,6 +15,13 @@ socket.on('pushSocketID', function(thisUserID){
   console.log(userID);
 });
 
+//get this sockets id
+socket.on('nicknameFromDB', function(nickname) {
+    userName = nickname;
+    document.getElementById('usersName').innerHTML=userName;
+    console.log(userName);
+});
+
 //get this socket it's name
 socket.on('pushSocketName', function(thisUserName){
   userName = thisUserName;
@@ -216,16 +223,6 @@ function drawingModeClient(){
       })
       .setCoords()
       .canvas.renderAll();
-  /*
-      //determine if we need to broadcast event to server
-      if(breakPoint === 10){
-        console.log("mouse moving");
-        breakPoint = 0;
-        document.elementFromPoint(x, y).click();
-      }
-      else{
-        breakPoint++;
-      }*/
   });
 
   canvas.on('mouse:out', function () {

@@ -13,9 +13,6 @@
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase.js"></script>
-    <link href="https://fonts.googleapis.com/css?family=Gaegu" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
 </head>
 <body style="background: #587291;">
 <!-- Auth Window -->
@@ -29,6 +26,9 @@
                 </button>
             </div>
             <div class="modal-body">
+                <div id="auth_modal_window_nickname_text_field_div">
+                    <input type="text" class="form-control" id="auth_modal_window_nickname_text_field" name="username" placeholder="Optional Nickname" required="" autofocus=""/>
+                </div>
                 <input type="text" class="form-control" id="auth_modal_window_email_text_field" name="username" placeholder="Email Address" required="" autofocus=""/>
                 <input type="password" class="form-control" id="auth_modal_window_password_text_field" name="password" placeholder="Password" required=""/>
                 <button class="btn btn-lg btn-primary btn-block" id="auth_modal_window_button" type="submit" onclick="auth()">Create Account</button>
@@ -129,21 +129,36 @@
 
     // authenticates a user
     function auth() {
+        const nickname = $('#auth_modal_window_nickname_text_field').val();
         const email = $('#auth_modal_window_email_text_field').val();
         const password = $('#auth_modal_window_password_text_field').val();
-
         if (userCreatingAccount()) {
-            createUserWithEmailAndPassword(email, password);
+            createUserWithEmailAndPassword(email, password, nickname)
         } else {
             logInWithEmailAndPassword(email, password);
         }
     }
 
     // creates an account in Firebase with an email and password
-    function createUserWithEmailAndPassword(email, password) {
+    function createUserWithEmailAndPassword(email, password, nickname) {
         firebase.auth().createUserWithEmailAndPassword(email, password)
-            .then (function () {
+            .then (function (user) {
                 $('#auth_modal_window').modal('hide');
+                user.getIdToken(true)
+                    .then(function (idToken) {
+                        let obj = {};
+                        obj.token = idToken;
+                        obj.nickname = nickname;
+                        socket.emit('nickname', obj);
+                    })
+                    .catch (function (error) {
+                        let errorCode = error.code;
+                        let errorMessage = error.message;
+                        if (errorCode && errorMessage) {
+                            console.log(errorCode);
+                            console.log(errorMessage);
+                        }
+                    });
             })
             .catch (function(error) {
                 let errorCode = error.code;
@@ -201,6 +216,7 @@
 
     // changes a a button title in the auth window footer
     function switchAuthModelWindowFooterButton() {
+        $('#auth_modal_window_nickname_text_field_div').empty();
         if (userCreatingAccount()) {
             $('#auth_modal_window_title').text('Sign In');
             $('#auth_modal_window_button').text('Sign In');
@@ -209,6 +225,7 @@
             $('#auth_modal_window_title').text('Create Account');
             $('#auth_modal_window_button').text('Sign In');
             $('#auth_modal_window_footer_button').text('Already have an account yet? Sign in here.');
+            $('#auth_modal_window_nickname_text_field_div').append('<input type="text" class="form-control" id="auth_modal_window_nickname_text_field" name="username" placeholder="Optional Nickname" required="" autofocus=""/>');
         }
     }
 
@@ -251,9 +268,7 @@
         removeFromQueue();
         console.log("sup from renderSavedPictures");
         let main = $('#main');
-        let footer = $('footer');
         main.empty();
-        footer.empty();
         main.append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>');
     }
 
