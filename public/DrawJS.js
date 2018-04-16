@@ -7,6 +7,7 @@ var canvas;
 var disconnect = false;
 var localQueueStore;
 var localScoreStore;
+var photoIndex = 0;
 
 
 //get this sockets id
@@ -157,9 +158,13 @@ function getImg(){
 }
 
 socket.on('retreivedImage', function(img){
-  //FIXME
-  canvas.loadFromJSON(img);
-
+  console.log("sup");
+  if (!(img == null)) {
+      canvas.loadFromJSON(img);
+  } else {
+      console.log('pizda');
+      photoIndex--;
+  }
 });
 
 

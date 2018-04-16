@@ -428,14 +428,20 @@ function readImageFromDB(uid, index, sid) {
     return firstQuery.once('value')
         .then (function(snapshot) {
             let i = 0;
+            let sent = false;
             snapshot.forEach(function (child) {
                 if (index === i) {
                     let image = child.val().image;
                     console.log("trying to emit to " + sid);
+                    sent = true;
                     io.to(sid).emit('retreivedImage', image);
                 }
+
                 i++;
             });
+            if (!sent) {
+                io.to(sid).emit('retreivedImage', null);
+            }
         });
 }
 
