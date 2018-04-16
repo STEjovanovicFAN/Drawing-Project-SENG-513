@@ -371,11 +371,10 @@ io.on('connection', function(socket) {
 
 // generates a random color.
 function randColor() {
-	let letters = '0123456789ABCDEF';
-    let color = '#';
-	for (let i = 0; i < 6; i++) {
-	    color += letters[Math.floor(Math.random() * 16)];
-	}
+    let colors = ["#00CD00", "#800080", "#8B1A1A", "#912CEE", "#964514", "#AA5303", "#BCE937", "#BF5FFF", "#C71585", "#CD6889", "#CDAD00", "#00E5EE"];
+    
+    var color = colors[Math.floor(Math.random() * colors.length)];
+
 	return color;
 }
 
