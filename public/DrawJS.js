@@ -55,7 +55,7 @@ socket.on('whosDrawing', function(currentDrawingUser){
     $('#outer').append('<input id="size" type="range" min="1" max="100" step="1" value="20" align="right">')
     $('#guessbox').empty();
     $('#guessbox').append('<input disabled placeholder="Chat disabled for drawer." type="text" onkeypress="checkForEnter(event)" id = "myGuess">');
-    
+
     $('#guessbox').append('<button  disabled id="submitGuess" class="btn-group-square">Send</button>');
     $('#guessbox').append('<script> function checkForEnter(event){ if (event.which === 13){submitGuess();}}</script>');
     drawingModeClient();
@@ -69,7 +69,7 @@ socket.on('whosDrawing', function(currentDrawingUser){
       console.log("I am listening");
       console.log("currentDrawingUser: " + currentDrawingUser);
       $('#outer').append('<h1><span id="timeLeft">Time left: </span><span id = time> </span></h1>')
-      $('#outer').append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>');
+      $('#outer').append('<div id="cont"> <canvas id="draw" width="1000" height="600"></canvas></div>');
 
       $('#guessbox').empty();
       $('#guessbox').append('<input type = "text" onkeypress="checkForEnter(event)" id = "myGuess">');
