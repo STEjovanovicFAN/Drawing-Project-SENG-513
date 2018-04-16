@@ -254,7 +254,11 @@
         let footer = $('footer');
         main.empty();
         footer.empty();
-        main.append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>');
+        main.append('<div id="savedPicContainer"><table>');
+        main.append('<tr><td id="left"><button id="left" onclick="" type="button" class="btn btn-primary"></span>←</button></td>');
+        main.append('<td><div id="cont"><canvas id="draw" width="500" height="500"></canvas></div><td>');        
+        main.append('<td id="right"><button id="left" onclick="" type="button" class="btn btn-primary">→</span></button></td></tr>');
+        main.append('</table></div>');
     }
 
     // remove the user from the game (queue of players)

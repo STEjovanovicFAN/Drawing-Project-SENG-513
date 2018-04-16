@@ -10,6 +10,20 @@
   #word{
     color:#7067CF;
   }
+  #left{
+    font-size:40px;
+    float:left;    
+  }
+  #right{
+    float:left;
+
+  }
+  #savedPicContainer{
+    background: red;
+  }
+  #savedPicContainer table tr td{
+    background: red;
+  }
   #scoreboardText {
       font-family: 'Gaegu', cursive;
       color: white;
