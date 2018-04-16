@@ -41,13 +41,11 @@ socket.on('whosDrawing', function(currentDrawingUser){
 
     console.log("I am now drawing");
     console.log("currentDrawingUser: " + currentDrawingUser);
-    $('#outer').append('Color: <input id="color" type="color" value="#000000"><br/>')
-    .append('Brush size: <input id="size" type="range" min="1" max="100" step="1" value="20"><br/>')
-    .append('<h1>Your word is: <span id = word>null</span></h1>')
-    .append('<h1>Time left: <span id = time> </span></h1>');
-
-    $('#outer').append('<div id="cont"> <canvas id="draw" width="500" height="500"></canvas> <canvas id="cursor" width="500" height="500"></canvas></div>');
-
+    $('#outer').append('<h1 id="wordHeading">Your word is: <span id = word>null</span></h1>')
+    $('#outer').append('<div id="cont"> <canvas id="draw" width="1000" height="600"></canvas> <canvas id="cursor" width="1000" height="600"></canvas></div>');
+    $('#outer').append('<h1 style="float:right;"><span id="timeLeft">Time left: </span> <span id = time> </span></h1>');
+    $('#outer').append('<h2><span id="timeLeft">Brush: </span><input id="color" type="color" value="#000000"></h2>')
+    $('#outer').append('<input id="size" type="range" min="1" max="100" step="1" value="20" align="right">')
     $('#guessbox').empty();
     $('#guessbox').append('<input disabled placeholder="Chat disabled for drawer." type="text" onkeypress="checkForEnter(event)" id = "myGuess">');
     
@@ -63,7 +61,7 @@ socket.on('whosDrawing', function(currentDrawingUser){
 
       console.log("I am listening");
       console.log("currentDrawingUser: " + currentDrawingUser);
-      $('#outer').append('<h1>Time left: <span id = time> </span></h1>')
+      $('#outer').append('<h1><span id="timeLeft">Time left: </span><span id = time> </span></h1>')
       $('#outer').append('<div id="cont"><canvas id="draw" width="500" height="500"></canvas></div>');
 
       $('#guessbox').empty();

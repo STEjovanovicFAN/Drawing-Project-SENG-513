@@ -13,6 +13,9 @@
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Gaegu" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
 </head>
 <body style="background: #587291;">
 <!-- Auth Window -->
@@ -57,27 +60,29 @@
         <!--this outer div is where the drawing/listening mode happens-->
         <div id = "outer">
         </div>
+        <div id= "title">
+            <h1 id= "timeLeft"><u>Score Board</u></h1>
+            <div id="scoreBoard">
+                <table id ="myTable">
+                </table>
+            </div>
+            <button id = "savepic" onclick="saveImg()" type="button" class="btn btn-primary">Save Image</button>   
+        </div>
+
+
     </article>
+    
     <aside>
         <div class="chatContainer">
             <div id="usernamePanel"><span id=usersName></span></div>         
             <div id="chat" class="chatbox"><ul id="messages"></ul></div> 
             <div id="guessbox" class="messagePanel"></div>
-        </div>
+        </div>           
       </aside>
+
 </div>
 <!-- Footer -->
-<footer>
-    <!-- save image button, move as required-->
-    <button id = "savepic" onclick="saveImg()">Save Image</button>
-    <!--retrieve image button - MOVE THIS TO OTHER PAGE-->
-    <button id = "getpic" onclick="getImg()">Retrieve Image</button>
-    <h1 id="scoreField"> Score: 0</h1>
 
-    <!--the scoreboard for the users -->
-    <div id="scoreBoard">
-    </div>
-</footer>
 <!-- JS -->
 <!--run the drawing functionality after everything is loaded-->
 <script type="text/javascript" src="DrawJS.js"></script>
