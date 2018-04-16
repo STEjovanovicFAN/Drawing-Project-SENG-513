@@ -66,7 +66,7 @@ app.get('/', function(req, res){
 //create a timer for 60 seconds, update clients every second (1000ms)
 function startNewTimer() {
     //console.log("i reset the timer");
-    time = 15;
+    time = 60;
     //while timer is running, send the current time for this round
     let timer = setInterval(function() {
         if (time >= 0) {
@@ -387,7 +387,7 @@ io.on('connection', function(socket) {
 // generates a random color.
 function randColor() {
     let colors = ["#00CD00", "#800080", "#8B1A1A", "#912CEE", "#964514", "#AA5303", "#BCE937", "#BF5FFF", "#C71585", "#CD6889", "#CDAD00", "#00E5EE"];
-    
+
     var color = colors[Math.floor(Math.random() * colors.length)];
 
 	return color;
