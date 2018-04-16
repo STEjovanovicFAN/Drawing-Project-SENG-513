@@ -1,10 +1,32 @@
 
   #cont {
     position: relative;
-    width: 500px;
-    height: 500px;
+    width: 1000px;
+    height: 600px;
   }
-
+  #draw{
+    background: white;
+  }
+  #word{
+    color:#7067CF;
+  }
+  #wordHeading{
+    font-family: 'Gaegu', cursive;
+    color:#ABD1B5;
+    font-weight: bolder
+  }
+  #time{
+    font-family: 'Gaegu', cursive;
+    color:#C33C54;
+    font-weight: bolder;
+    font-size: 50px;
+  }
+  #timeLeft{
+    font-family: 'Gaegu', cursive;
+    color:#C33C54;
+    font-weight: bolder;
+    color: #ABD1B5
+  }
   canvas {
     border: 1px solid;
   }
@@ -20,10 +42,64 @@
   #cursor {
     pointer-events: none!important;
   }
+  #usernamePanel{
+    background: whitesmoke;
+    padding-top: 1%;      /*panel*/
+    padding-left: 2%;
+    height:5%;
+    width:100%;
+    }
+
+  #usersName{
+    font-size: 20px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  }
+  #myGuess{
+    height: 2em;
+    width: 80%; 
+    margin-left: .5%;
+    margin-right: .5%;
+  }
+  #submitGuess{
+    width: 19%;
+    height: 2em;
+    padding: 2px;
+        
+  }
+  .chatContainer{
+    font-size:14px;
+    height:100%;
+    position: relative;
+  }
+  .chatbox{
+    margin-bottom: -10px;
+    height:93%;
+    width: 100%;
+    position: relative;    
+  }
+  .chatbox ul{
+    list-style-type: none;
+    height:98%;
+    width: 100%;
+    background: white;
+    overflow-y: scroll;
+    position: absolute;
+    overflow-wrap: break-word;
+  }
+  .chatbox ul li{
+    margin-left: -30px;
+    height:auto;
+  }
+  .messagePanel{
+    
+  }
+  .messagePanel input[type=text]{
+    width: 80%;
+  }
 
 body {
     font: 24px Helvetica;
-    background: red;
+    height:100%;
     margin: 0px;
 }
 .navbar navbar-inverse{
@@ -41,12 +117,30 @@ body {
 }
 
 #main > article {
-    margin: 4px;
-    padding: 5px;
-    height: 800px;
-    background: #2F97C1;
-    flex: 3 1 60%;
-    order: 2;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-flex-wrap: nowrap;
+  -ms-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  -webkit-align-content: stretch;
+  -ms-flex-line-pack: stretch;
+  align-content: stretch;
+  -webkit-align-items: flex-start;
+  -ms-flex-align: start;
+  align-items: flex-start;
+  margin: 4px;
+  padding: 5px;
+  height: 800px;
+  background: #2F97C1;
+  flex: 3 1 60%;
+  order: 2;
 }
 
 #main > aside {
@@ -56,6 +150,21 @@ body {
     flex: 1 6 20%;
     order: 3;
 }
+#main > article > #title > #scoreBoard {
+  border-collapse: collapse;
+  padding-right: 100px;
+  width: 300px;
+  table-layout: fixed;
+}
+
+#main > article > #title > #scoreBoard, td, th {
+  text-align: left;
+  padding: 10px;
+  
+}
+
+
+
 #navbar>#logout-button{
   float: right;
   background: red;
@@ -68,28 +177,46 @@ header, footer {
     min-height: 100px;
     background: #15E6CD;
 }
-
-.wrapper {
-	margin-top: 80px;
-  margin-bottom: 80px;
-}
-.form-signin {
-  max-width: 380px;
-  padding: 15px 35px 45px;
-  margin: auto;
-  background-color: #fff;
-  border: 1px solid rgba(0,0,0,0.1);
+#outer2 > #size{
+  width: 300px;
+  
 }
 
-input[type="text"] {
-  margin-bottom: 20px;
+#outer{
+  float: bottom;
+}
+
+footer{
+    display: flex;
+    flex-direction: row;
+    margin: 4px;
+    padding: 5px;
+    min-height: 100px;
+    background: #15E6CD;
+    
 
 }
 
-	input[type="password"] {
-	  margin-bottom: 20px;
-	}
+footer > #score{
+  font-family: 'Gaegu', cursive;
+  float: right;
+
 }
+
+#savepic{
+  align:left;
+  display:inline;
+  position: relative;
+
+}
+
+footer > #container2 > #getpic{
+  position: relative;
+  left: 650px;
+  top: 20px;
+}
+
+
 
 /* Too narrow to support three columns */
 @media all and (max-width: 640px) {
